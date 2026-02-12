@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AaMilNa • Admin Approval</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:#fff7f0;
+  color:#4a3b47;
+}
+
+/* BACKGROUND (LOCKED) */
+.bubble-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.bubble{
+  position:absolute;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle at top left,
+    rgba(255,255,255,0.9),
+    rgba(255,220,230,0.45),
+    rgba(200,150,170,0.25));
+  backdrop-filter:blur(6px);
+  animation:float 30s infinite ease-in-out;
+}
+.bubble::after{
+  content:"🌸";position:absolute;inset:0;
+  display:flex;justify-content:center;align-items:center;
+  font-size:70px;opacity:0.35;
+}
+.bubble:nth-child(1){top:10%;left:6%;}
+.bubble:nth-child(2){top:55%;left:72%;}
+.bubble:nth-child(3){top:30%;left:42%;}
+@keyframes float{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-60px);}
+  100%{transform:translateY(0);}
+}
+
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:22px 50px;
+  background:rgba(255,255,255,0.85);
+  box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+header h1{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+}
+
+/* DASHBOARD */
+.dashboard{
+  max-width:1200px;
+  margin:120px auto 80px;
+  padding:0 30px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:30px;
+}
+
+.card{
+  background:white;
+  padding:22px;
+  border-radius:26px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.12);
+}
+
+/* ✅ FULL IMAGE FIX */
+.card img{
+  width:100%;
+  height:auto;
+  max-height:420px;
+  object-fit:contain;
+  border-radius:18px;
+  background:#f6f1ee;
+  margin-bottom:14px;
+}
+
+.card h4{margin-bottom:6px;}
+.card p{font-size:14px;opacity:.8;margin-bottom:6px;}
+.card strong{display:block;margin-top:4px;}
+
+.status{
+  font-size:13px;
+  margin:10px 0;
+  font-weight:500;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.actions button{
+  flex:1;
+  padding:9px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-weight:500;
+}
+
+.approve{background:#c7e3c2;}
+.reject{background:#f3c2c2;}
+.delete{background:#d8a7a0;}
+
+.approve:hover{background:#b5d9b0;}
+.reject:hover{background:#e7a9a9;}
+.delete:hover{background:#c8928a;}
+</style>
+</head>
+
+<body>
+
+<div class="bubble-bg">
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+</div>
+
+<header>
+  <h1>Admin • Product Review</h1>
+</header>
+
+<section class="dashboard">
+  <div class="grid" id="adminProducts"></div>
+</section>
+
+<script>
+const container = document.getElementById("adminProducts");
+
+/* 🔑 SHARED STORAGE */
+let pendingProducts = JSON.parse(localStorage.getItem("pendingProducts")) || [];
+
+function render(){
+  container.innerHTML = "";
+
+  if(pendingProducts.length === 0){
+    container.innerHTML = "<p>No pending submissions.</p>";
+    return;
+  }
+
+  pendingProducts.forEach((p,i)=>{
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <img src="${p.image}">
+      <h4>${p.name}</h4>
+      <p>${p.desc}</p>
+      <strong>${p.price}</strong>
+      <div class="status">Status: ${p.status}</div>
+
+      <div class="actions">
+        <button class="approve" onclick="approve(${i})">Approve</button>
+        <button class="reject" onclick="reject(${i})">Reject</button>
+        <button class="delete" onclick="removeProduct(${i})">Delete</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+window.approve = i => {
+  pendingProducts[i].status = "Approved";
+  save();
+};
+
+window.reject = i => {
+  pendingProducts[i].status = "Rejected";
+  save();
+};
+
+window.removeProduct = i => {
+  if(confirm("Delete permanently?")){
+    pendingProducts.splice(i,1);
+    save();
+  }
+};
+
+function save(){
+  localStorage.setItem("pendingProducts", JSON.stringify(pendingProducts));
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AaMilNa • Artisan Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Poppins',sans-serif;background:#fff7f0;color:#4a3b47;overflow-x:hidden;}
+
+.bubble-bg{position:fixed;inset:0;z-index:-1;}
+.bubble{position:absolute;width:260px;height:260px;border-radius:50%;
+background:radial-gradient(circle at top left,rgba(255,255,255,.9),rgba(255,220,230,.45),rgba(200,150,170,.25));
+animation:float 30s infinite ease-in-out;}
+.bubble::after{content:"🌸";display:flex;align-items:center;justify-content:center;height:100%;font-size:70px;opacity:.35;}
+.bubble:nth-child(1){top:8%;left:6%;}
+.bubble:nth-child(2){top:55%;left:70%;}
+.bubble:nth-child(3){top:30%;left:40%;}
+@keyframes float{50%{transform:translateY(-60px)}}
+
+header{display:flex;justify-content:space-between;align-items:center;padding:22px 50px;background:rgba(255,255,255,.85);}
+header img{height:90px;}
+header .actions{display:flex;gap:12px;}
+header button{background:#d8a7a0;border:none;padding:10px 22px;border-radius:30px;cursor:pointer;}
+
+.dashboard{max-width:1300px;margin:120px auto 80px;padding:0 30px;}
+h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
+
+.profileBox{display:flex;gap:20px;align-items:center;}
+.avatar{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #d8a7a0;}
+.editProfile{margin-top:10px;background:#d8a7a0;border:none;padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;}
+
+.layout{display:grid;grid-template-columns:2fr 1fr;gap:30px;}
+
+.box{background:#fff;padding:25px;border-radius:28px;box-shadow:0 20px 40px rgba(0,0,0,.12);margin-bottom:30px;}
+
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;}
+.product{background:#fff;padding:18px;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.1);}
+.product img{width:100%;height:160px;object-fit:cover;border-radius:16px;}
+.controls{display:flex;gap:8px;margin-top:10px;}
+.controls button{flex:1;padding:6px;border-radius:14px;font-size:13px;border:none;cursor:pointer;}
+.edit{background:#d8a7a0;}
+.delete{background:#b96a6a;color:white;}
+
+.orders{max-height:65vh;overflow-y:auto;}
+.order{border-bottom:1px solid #eee;padding:12px 0;}
+.order img{width:70px;height:70px;object-fit:cover;border-radius:14px;}
+
+.modal{position:fixed;inset:0;background:#00000066;display:none;align-items:center;justify-content:center;}
+.modalContent{background:white;padding:30px;border-radius:26px;width:400px;position:relative;max-height:80vh;overflow-y:auto;}
+.modalContent input,.modalContent textarea,.modalContent select{width:100%;margin-bottom:10px;padding:8px;border-radius:12px;border:1px solid #ddd;}
+.closeBtn{position:absolute;top:12px;right:16px;font-size:20px;cursor:pointer;color:#b96a6a;}
+</style>
+</head>
+
+<body>
+
+<div class="bubble-bg"><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div></div>
+
+<header>
+  <img src="logo.png">
+  <div class="actions">
+    <button onclick="location.href='index.html'">Home</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<section class="dashboard">
+<h1>Artisan Dashboard</h1>
+
+<div class="box profileBox">
+  <img id="avatar" class="avatar">
+  <div>
+    <strong id="pName"></strong><br>
+    <small id="pBio"></small><br>
+    <button class="editProfile" onclick="openProfile()">Edit Profile</button>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="box">
+<h3>Your Products</h3><br>
+<button class="editProfile" onclick="openProduct()">+ Add Product</button><br><br>
+<div class="products" id="productList"></div>
+</div>
+
+<div class="box">
+<h3>📦 Orders</h3><br>
+<div class="orders" id="orderList"></div>
+</div>
+
+</div>
+</section>
+
+<!-- Profile Modal -->
+<div class="modal" id="profileModal">
+<div class="modalContent">
+<span class="closeBtn" onclick="profileModal.style.display='none'">&times;</span>
+<h3>Edit Profile</h3>
+<input id="nameInput" placeholder="Your name">
+<textarea id="bioInput" placeholder="Your bio"></textarea>
+<input type="file" accept="image/*" onchange="loadAvatar(event)">
+<button class="editProfile" onclick="saveProfile()">Save</button>
+</div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal" id="productModal">
+<div class="modalContent">
+<span class="closeBtn" onclick="productModal.style.display='none'">&times;</span>
+<h3>Add / Edit Product</h3>
+<input id="prodName" placeholder="Product name">
+<textarea id="prodDesc" placeholder="Product description"></textarea>
+<input id="prodPrice" placeholder="Price">
+<input type="file" accept="image/*" onchange="loadImage(event)">
+<button class="editProfile" onclick="saveProduct()">Save</button>
+</div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal" id="orderModal">
+<div class="modalContent">
+<span class="closeBtn" onclick="orderModal.style.display='none'">&times;</span>
+<h3>Order Details</h3>
+<div id="orderDetailsContent"></div>
+<select id="statusSelect">
+  <option value="Packaged">Packaged</option>
+  <option value="Shipped">Shipped</option>
+  <option value="In Cargo">In Cargo</option>
+  <option value="Dropped">Dropped</option>
+  <option value="Dispatched">Dispatched</option>
+</select>
+<button class="editProfile" onclick="updateOrderStatus()">Update Status</button>
+</div>
+</div>
+
+<script>
+/* ===============================
+   ARTISAN PROFILE & PRODUCTS
+=================================*/
+let artisan = JSON.parse(localStorage.getItem("artisanProfile"));
+if(!artisan){
+  artisan={
+    id:"main_artisan_fixed_id",
+    name:"Artisan",
+    bio:"Handmade creator at AaMilNa",
+    avatar:"https://via.placeholder.com/150"
+  };
+  localStorage.setItem("artisanProfile",JSON.stringify(artisan));
+}
+
+let products = JSON.parse(localStorage.getItem("pendingProducts")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+let currentImage="",currentAvatar="",editIndex=null;
+
+avatar.src = artisan.avatar;
+pName.textContent = artisan.name;
+pBio.textContent = artisan.bio;
+
+/* PROFILE FUNCTIONS */
+function openProfile(){
+  profileModal.style.display="flex";
+  nameInput.value = artisan.name;
+  bioInput.value = artisan.bio;
+}
+
+function loadAvatar(e){
+  const r=new FileReader();
+  r.onload=()=>currentAvatar=r.result;
+  r.readAsDataURL(e.target.files[0]);
+}
+
+function saveProfile(){
+  artisan.name=nameInput.value;
+  artisan.bio=bioInput.value;
+  if(currentAvatar) artisan.avatar=currentAvatar;
+  localStorage.setItem("artisanProfile",JSON.stringify(artisan));
+  avatar.src=artisan.avatar;
+  pName.textContent=artisan.name;
+  pBio.textContent=artisan.bio;
+  profileModal.style.display="none";
+  currentAvatar="";
+}
+
+/* PRODUCT FUNCTIONS */
+function openProduct(i=null){
+  editIndex=i;
+  productModal.style.display="flex";
+  if(i!==null){
+    let p=products[i];
+    prodName.value=p.name;
+    prodDesc.value=p.description;
+    prodPrice.value=p.price;
+    currentImage=p.image;
+  } else {
+    prodName.value=""; prodDesc.value=""; prodPrice.value=""; currentImage="";
+  }
+}
+
+function loadImage(e){
+  const r=new FileReader();
+  r.onload=()=>currentImage=r.result;
+  r.readAsDataURL(e.target.files[0]);
+}
+
+function saveProduct(){
+  let data={
+    id:editIndex!==null?products[editIndex].id:Date.now(),
+    artisanId:artisan.id,
+    name:prodName.value,
+    description:prodDesc.value,
+    price:prodPrice.value,
+    image:currentImage
+  };
+  if(editIndex!==null) products[editIndex]=data; else products.push(data);
+  localStorage.setItem("pendingProducts",JSON.stringify(products));
+  productModal.style.display="none";
+  renderProducts();
+}
+
+/* RENDER PRODUCTS */
+function renderProducts(){
+  productList.innerHTML="";
+  products.filter(p=>p.artisanId===artisan.id).forEach((p,i)=>{
+    productList.innerHTML+=`
+    <div class="product">
+      <img src="${p.image}">
+      <h4>${p.name}</h4>
+      <strong>${p.price} PKR</strong>
+      <div class="controls">
+        <button class="edit" onclick="openProduct(${i})">Edit</button>
+        <button class="delete" onclick="deleteProduct(${i})">Delete</button>
+      </div>
+    </div>`;
+  });
+}
+
+/* DELETE PRODUCT */
+function deleteProduct(i){
+  if(confirm("Delete product?")){
+    products.splice(i,1);
+    localStorage.setItem("pendingProducts",JSON.stringify(products));
+    renderProducts();
+  }
+}
+
+/* ===============================
+   ORDER FUNCTIONS
+=================================*/
+function renderOrders(){
+  orderList.innerHTML="";
+  orders.filter(o=>o.artisanId===artisan.id).forEach((o,i)=>{
+    orderList.innerHTML+=`
+    <div class="order">
+      <img src="${o.image}">
+      <strong>${o.productName}</strong><br>
+      <small>${o.customerName} — ${o.customerEmail}</small><br>
+      <small>${o.customerContact} — ${o.customerAddress}</small><br>
+      <small>Ordered On: ${o.date || 'N/A'}</small><br>
+      <small>Status: ${o.status}</small><br>
+      <button class="editProfile" onclick="openOrderModal(${i})">View & Update</button>
+    </div>`;
+  });
+}
+
+let currentOrderIndex = null;
+function openOrderModal(i){
+  currentOrderIndex = i;
+  const o = orders[i];
+  orderDetailsContent.innerHTML=`
+    <img src="${o.image}" style="width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:10px;">
+    <p><strong>Product:</strong> ${o.productName}</p>
+    <p><strong>Customer:</strong> ${o.customerName}</p>
+    <p><strong>Email:</strong> ${o.customerEmail}</p>
+    <p><strong>Contact:</strong> ${o.customerContact}</p>
+    <p><strong>Address:</strong> ${o.customerAddress}</p>
+    <p><strong>Ordered On:</strong> ${o.date || 'N/A'}</p>
+    <p><strong>Current Status:</strong> ${o.status}</p>
+  `;
+  statusSelect.value = o.status;
+  orderModal.style.display="flex";
+}
+
+function updateOrderStatus(){
+  if(currentOrderIndex!==null){
+    orders[currentOrderIndex].status=statusSelect.value;
+    localStorage.setItem("orders",JSON.stringify(orders));
+    renderOrders();
+    orderModal.style.display="none";
+    currentOrderIndex = null;
+  }
+}
+
+/* LOGOUT */
+function logout(){
+  alert("Logout disabled for testing mode.");
+}
+
+/* INITIAL RENDER */
+renderProducts();
+renderOrders();
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

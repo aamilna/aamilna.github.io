@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AaMilNa • Artisan Create Account</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:#fff7f0;
+  color:#4a3b47;
+  overflow-x:hidden;
+}
+
+/* 🌸 SAME PERMANENT BACKGROUND */
+.bubble-bg{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  overflow:hidden;
+}
+.bubble{
+  position:absolute;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at top left,
+      rgba(255,255,255,0.9),
+      rgba(255,220,230,0.45),
+      rgba(200,150,170,0.25)
+    );
+  backdrop-filter: blur(6px);
+  animation: float 28s infinite ease-in-out;
+}
+.bubble::after{
+  content:"🌸";
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:70px;
+  opacity:0.35;
+}
+.bubble:nth-child(1){top:10%;left:5%;}
+.bubble:nth-child(2){top:55%;left:70%;animation-duration:34s;}
+.bubble:nth-child(3){top:30%;left:40%;animation-duration:40s;}
+
+@keyframes float{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-60px);}
+  100%{transform:translateY(0);}
+}
+
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:22px 50px;
+  background:rgba(255,255,255,0.85);
+  box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+header img{height:90px;}
+header a{
+  text-decoration:none;
+  color:#4a3b47;
+  font-weight:500;
+}
+
+/* FORM SECTION */
+.signup-section{
+  min-height:calc(100vh - 160px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:60px 20px;
+}
+
+.signup-box{
+  background:rgba(255,255,255,0.95);
+  padding:45px 40px;
+  border-radius:30px;
+  width:100%;
+  max-width:520px;
+  box-shadow:0 25px 50px rgba(0,0,0,0.12);
+}
+
+.signup-box h1{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.signup-box p{
+  text-align:center;
+  opacity:0.8;
+  margin-bottom:30px;
+  font-size:15px;
+}
+
+/* INPUTS */
+.signup-box input{
+  width:100%;
+  padding:14px 18px;
+  margin-bottom:16px;
+  border-radius:20px;
+  border:1px solid #e3cfc8;
+  font-family:'Poppins',sans-serif;
+  font-size:14px;
+}
+
+.signup-box input:focus{
+  outline:none;
+  border-color:#d8a7a0;
+}
+
+/* BUTTON */
+.signup-box button{
+  width:100%;
+  background:#d8a7a0;
+  color:#4a3b47;
+  border:none;
+  padding:14px;
+  border-radius:30px;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.signup-box button:hover{
+  background:#c8928a;
+}
+
+/* FOOTER TEXT */
+.signup-box .note{
+  margin-top:20px;
+  text-align:center;
+  font-size:13px;
+  opacity:0.75;
+}
+
+.signup-box .note a{
+  color:#4a3b47;
+  text-decoration:underline;
+}
+
+/* FOOTER */
+footer{
+  background:#eadfd4;
+  text-align:center;
+  padding:22px;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bubble-bg">
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+</div>
+
+<header>
+  <img src="logo.png" alt="AaMilNa Logo">
+  <a href="index.html">← Back to Home</a>
+</header>
+
+<section class="signup-section">
+  <div class="signup-box">
+    <h1>Artisan Create Account</h1>
+    <p>AaMilNa is a platform where artisans lead, create and grow freely.</p>
+
+    <input id="name" type="text" placeholder="Full Name">
+    <input id="brand" type="text" placeholder="Brand Name">
+    <input id="city" type="text" placeholder="City">
+    <input id="email" type="email" placeholder="Email Address">
+    <input id="phone" type="tel" placeholder="Phone Number">
+    <input id="password" type="password" placeholder="Password">
+
+    <button id="signupBtn">Create Artisan Account</button>
+
+    <div class="note">
+      Already have an artisan account?
+      <a href="artisan-login.html">Sign in</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Official contact: <strong>aamila.com@gmail.com</strong>
+</footer>
+
+<!-- 🔥 FIREBASE (NO DESIGN TOUCHED) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCHMIBHlYGqyw4U7ZZplwi4LgQxga99nLM",
+    authDomain: "aamilna.firebaseapp.com",
+    projectId: "aamilna",
+    storageBucket: "aamilna.firebasestorage.app",
+    messagingSenderId: "127180284017",
+    appId: "1:127180284017:web:b024e50670228b085f7bd0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+    const name = document.getElementById("name").value.trim();
+    const brand = document.getElementById("brand").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!name || !brand || !city || !email || !phone || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      await setDoc(doc(db, "artisans", userCredential.user.uid), {
+        name,
+        brand,
+        city,
+        email,
+        phone,
+        role: "artisan",
+        createdAt: new Date()
+      });
+
+      alert("Artisan account created successfully!");
+      window.location.href = "index.html";
+
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+

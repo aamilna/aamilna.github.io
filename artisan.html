@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AaMilNa • Artisan</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:#fff7f0;
+  color:#4a3b47;
+  overflow-x:hidden;
+}
+
+/* 🔒 BACKGROUND (LOCKED — DO NOT TOUCH) */
+.bubble-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.bubble{
+  position:absolute;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle at top left,
+    rgba(255,255,255,0.9),
+    rgba(255,220,230,0.45),
+    rgba(200,150,170,0.25));
+  backdrop-filter:blur(6px);
+  animation:float 32s infinite ease-in-out;
+}
+.bubble::after{
+  content:"🌸";
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:70px;opacity:0.35;
+}
+.bubble:nth-child(1){top:10%;left:6%;}
+.bubble:nth-child(2){top:58%;left:72%;}
+.bubble:nth-child(3){top:32%;left:42%;}
+@keyframes float{
+  50%{transform:translateY(-60px);}
+}
+
+/* PROFILE */
+.profile{
+  max-width:1100px;
+  margin:120px auto 80px;
+  padding:0 30px;
+}
+
+.profile h1{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:48px;
+}
+
+.profile p{
+  opacity:0.8;
+  margin-bottom:40px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:26px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.12);
+}
+
+.card img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  border-radius:18px;
+}
+
+.empty{
+  opacity:0.7;
+  font-style:italic;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bubble-bg">
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+</div>
+
+<section class="profile">
+  <h1 id="artisanName">Our Artisan</h1>
+  <p id="artisanBio">Handcrafted pieces approved by AaMilNa.</p>
+
+  <div class="grid" id="artisanProducts"></div>
+</section>
+
+<script>
+const products = JSON.parse(localStorage.getItem("pendingProducts")) || [];
+
+const approvedProducts = products.filter(p => p.status === "Approved");
+
+const grid = document.getElementById("artisanProducts");
+
+if(approvedProducts.length === 0){
+  grid.innerHTML = `<p class="empty">No approved products available yet.</p>`;
+}else{
+  approvedProducts.forEach(p=>{
+    grid.innerHTML += `
+      <div class="card">
+        <img src="${p.image}" alt="">
+        <h4>${p.name || "Handmade Product"}</h4>
+        <p>${p.price || ""}</p>
+      </div>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
+
