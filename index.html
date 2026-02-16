@@ -100,6 +100,7 @@ footer{background:#eadfd4;text-align:center;padding:25px;font-size:14px;}
 
 /* RESPONSIVE */
 @media(max-width:900px){.story-section{flex-direction:column;gap:30px;}}
+
 </style>
 </head>
 
@@ -169,7 +170,7 @@ function setNavLinks() {
   if(artisan && artisan.id) links += `<a href="artisan-dashboard.html">Dashboard</a>`;
   else if(customer && customer.id) links += `<a href="customer-dashboard.html">Dashboard</a>`;
   else {
-    links += `<a href="shop.html">Shop</a>
+    links += `<a href="customer-login.html">Customer</a>
               <a href="artisan-signup.html">Artisan</a>`;
     if(showAdminButton) links += `<a href="#" id="adminBtn">Admin</a>`;
   }
@@ -269,6 +270,7 @@ if(artisan && artisan.id) setProfile(artisan,'artisan');
 
 </body>
 </html>
+
 
 
 
