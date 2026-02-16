@@ -44,7 +44,8 @@ header h1{font-family:'Playfair Display',serif;font-style:italic;}
 }
 .profile-dropdown h4{margin-bottom:6px;font-size:16px;}
 .profile-dropdown p{margin-bottom:6px;font-size:14px;color:#555;}
-.profile-dropdown button{margin-top:10px;background:#d8a7a0;border:none;padding:10px;border-radius:20px;cursor:pointer;width:100%;font-weight:500;}
+.profile-dropdown input{margin-bottom:8px;padding:6px;border-radius:8px;border:1px solid #ddd;font-family:'Poppins';width:100%;}
+.profile-dropdown button{margin-top:6px;background:#d8a7a0;border:none;padding:10px;border-radius:20px;cursor:pointer;width:100%;font-weight:500;}
 .profile-dropdown button:hover{background:#c8928a;}
 
 /* DASHBOARD */
@@ -105,13 +106,13 @@ textarea{width:100%;padding:8px;border-radius:12px;border:1px solid #ddd;margin-
 
 <script>
 // ===== ADMIN LOGIN =====
-const ADMIN_PASSWORD = "AaMilNaAdmin123"; // your secure password
+const ADMIN_PASSWORD = "AaMilNaAdmin123";
 let adminLoggedIn = sessionStorage.getItem("adminLoggedIn");
 
 if(!adminLoggedIn){
   const pass = prompt("Enter Admin Password:");
   if(pass === ADMIN_PASSWORD){
-    sessionStorage.setItem("adminLoggedIn", "true");
+    sessionStorage.setItem("adminLoggedIn","true");
     adminLoggedIn = true;
   } else {
     alert("Incorrect password! Redirecting to homepage.");
@@ -120,30 +121,62 @@ if(!adminLoggedIn){
 }
 
 // ===== ADMIN PROFILE =====
-const adminProfile = {
+let adminProfile = JSON.parse(localStorage.getItem("adminProfile")) || {
   name: "Your Name",
   email: "aamila.com@gmail.com",
   avatar: "https://via.placeholder.com/150"
 };
 
-// RENDER PROFILE
 const profileContainer = document.getElementById("profileContainer");
-profileContainer.innerHTML = `
-  <img src="${adminProfile.avatar}" class="profile-avatar" id="profileAvatar">
-  <div class="profile-dropdown" id="profileDropdown">
-    <h4>${adminProfile.name}</h4>
-    <p><strong>Email:</strong> ${adminProfile.email}</p>
-    <button id="logoutBtn">Logout</button>
-  </div>
-`;
-const avatarImg = document.getElementById('profileAvatar');
-const dropdown = document.getElementById('profileDropdown');
-avatarImg.addEventListener('click', (e)=>{e.stopPropagation(); dropdown.style.display = dropdown.style.display==='flex'?'none':'flex';});
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  sessionStorage.removeItem("adminLoggedIn");
-  location.href = "index.html";
-});
-document.addEventListener('click', (e)=>{if(!profileContainer.contains(e.target)) dropdown.style.display='none';});
+function renderProfile(){
+  profileContainer.innerHTML = `
+    <img src="${adminProfile.avatar}" class="profile-avatar" id="profileAvatar">
+    <div class="profile-dropdown" id="profileDropdown">
+      <input type="text" id="adminName" value="${adminProfile.name}" placeholder="Your Name">
+      <input type="email" id="adminEmail" value="${adminProfile.email}" placeholder="Email">
+      <input type="file" id="adminAvatar" accept="image/*">
+      <button id="saveProfile">Save Profile</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  `;
+
+  const avatarImg = document.getElementById('profileAvatar');
+  const dropdown = document.getElementById('profileDropdown');
+
+  avatarImg.addEventListener('click',(e)=>{e.stopPropagation(); dropdown.style.display = dropdown.style.display==='flex'?'none':'flex';});
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    sessionStorage.removeItem("adminLoggedIn");
+    location.href="index.html";
+  });
+
+  document.getElementById('saveProfile').addEventListener('click', ()=>{
+    const newName = document.getElementById('adminName').value.trim();
+    const newEmail = document.getElementById('adminEmail').value.trim();
+    if(newName) adminProfile.name = newName;
+    if(newEmail) adminProfile.email = newEmail;
+    localStorage.setItem("adminProfile", JSON.stringify(adminProfile));
+    alert("Profile updated!");
+    renderProfile();
+  });
+
+  const avatarInput = document.getElementById('adminAvatar');
+  avatarInput.addEventListener('change',(e)=>{
+    const file = e.target.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        adminProfile.avatar = ev.target.result;
+        localStorage.setItem("adminProfile", JSON.stringify(adminProfile));
+        renderProfile();
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.addEventListener('click',(e)=>{if(!profileContainer.contains(e.target)) dropdown.style.display='none';});
+}
+renderProfile();
 
 // ===== INITIAL PRODUCTS =====
 if(!localStorage.getItem("allProducts")){
@@ -164,7 +197,7 @@ const approvedContainer = document.getElementById("approvedProducts");
 const rejectedContainer = document.getElementById("rejectedProducts");
 const deletedContainer = document.getElementById("deletedProducts");
 
-// RENDER FUNCTION
+// RENDER PRODUCTS
 function render(){
   pendingContainer.innerHTML=""; approvedContainer.innerHTML=""; rejectedContainer.innerHTML=""; deletedContainer.innerHTML="";
   products.forEach((p,i)=>{
@@ -230,6 +263,7 @@ render();
 
 </body>
 </html>
+
 
 
 

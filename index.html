@@ -124,20 +124,48 @@ footer{background:#eadfd4;text-align:center;padding:25px;font-size:14px;}
 // --- NAVIGATION & PROFILE ---
 const nav = document.getElementById("navLinks");
 const profileContainer = document.getElementById("profileContainer");
+
+// Simulated user info
 const artisan = JSON.parse(localStorage.getItem("artisanProfile"));
 const customer = JSON.parse(localStorage.getItem("currentCustomer"));
 
+// Admin access flag (only for you)
+const showAdminButton = true; 
+const adminPassword = "AaMilNaSecret123"; // your secret password
+
 function setNavLinks(){
+  let links = '';
+
   if(artisan && artisan.id){
-    nav.innerHTML = `<a href="artisan-dashboard.html">Dashboard</a>`;
-  }else if(customer && customer.id){
-    nav.innerHTML = `<a href="shop.html">Shop</a>`;
-  }else{
-    nav.innerHTML = `<a href="artisan-signup.html">Artisan</a>
-                     <a href="customer-login.html">Customer</a>`;
+    links += `<a href="artisan-dashboard.html">Dashboard</a>`;
+  } else if(customer && customer.id){
+    links += `<a href="shop.html">Shop</a>`;
+  } else {
+    links += `<a href="artisan-signup.html">Artisan</a>
+              <a href="customer-login.html">Customer</a>`;
+    if(showAdminButton){
+      links += `<a href="#" id="adminBtn">Admin</a>`; // password prompt handled in JS
+    }
+  }
+
+  nav.innerHTML = links;
+
+  // Admin click
+  const adminLink = document.getElementById('adminBtn');
+  if(adminLink){
+    adminLink.addEventListener('click', ()=>{
+      const pwd = prompt("Enter Admin Password:");
+      if(pwd === adminPassword){
+        alert("Welcome Admin!");
+        window.location.href = "admin-dashboard.html";
+      } else {
+        alert("Incorrect password!");
+      }
+    });
   }
 }
 
+// --- LOGOUT & PROFILE ---
 function logout(type){
   if(type==='artisan') localStorage.removeItem('artisanProfile');
   if(type==='customer') localStorage.removeItem('currentCustomer');
@@ -161,12 +189,15 @@ function setProfile(user, type){
   const avatarImg = document.getElementById('profileAvatar');
   const dropdown = document.getElementById('profileDropdown');
 
-  avatarImg.addEventListener('click', (e)=>{e.stopPropagation(); dropdown.style.display = dropdown.style.display==='flex' ? 'none':'flex';});
+  avatarImg.addEventListener('click', e=>{
+    e.stopPropagation(); 
+    dropdown.style.display = dropdown.style.display==='flex' ? 'none':'flex';
+  });
   document.getElementById('logoutBtn').addEventListener('click', ()=> logout(type));
 
   if(type==='customer'){
     const avatarUpload = document.getElementById('avatarUpload');
-    avatarUpload.addEventListener('change', (e)=>{
+    avatarUpload.addEventListener('change', e=>{
       const file = e.target.files[0];
       if(file){
         const reader = new FileReader();
@@ -180,7 +211,9 @@ function setProfile(user, type){
     });
   }
 
-  document.addEventListener('click', (e)=>{if(!profileContainer.contains(e.target)) dropdown.style.display='none';});
+  document.addEventListener('click', e=>{
+    if(!profileContainer.contains(e.target)) dropdown.style.display='none';
+  });
 }
 
 // --- COLLECTION CARDS ---
@@ -198,7 +231,6 @@ const collections = [
 ];
 
 const collectionContainer = document.getElementById('collectionContainer');
-
 collections.forEach(col=>{
   const card = document.createElement('div');
   card.className='card';
@@ -218,6 +250,10 @@ if(customer && customer.id) setProfile(customer,'customer');
 
 </body>
 </html>
+
+
+
+
 
 
 

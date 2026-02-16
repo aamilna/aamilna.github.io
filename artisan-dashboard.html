@@ -79,7 +79,7 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 .modal{position:fixed;inset:0;background:#00000066;display:none;align-items:center;justify-content:center;}
 .modalContent{background:white;padding:30px;border-radius:26px;width:420px;position:relative;animation:fadeIn .3s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
-.modalContent input,.modalContent textarea,.modalContent select{width:100%;margin-bottom:12px;padding:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins';}
+.modalContent input,.modalContent textarea,.modalContent select{width:100%;margin-bottom:12px;padding:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins';box-sizing:border-box;}
 .modalContent button{background:#d8a7a0;border:none;padding:10px;border-radius:18px;width:100%;cursor:pointer;}
 .closeBtn{position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;color:#b96a6a;}
 
@@ -176,7 +176,7 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 <div id="deliveryMsg" class="successMsg"></div>
 </div>
 
-<!-- Modals (Profile & Product) -->
+<!-- Modals -->
 <div class="modal" id="profileModal">
 <div class="modalContent">
 <span class="closeBtn" onclick="profileModal.style.display='none'">&times;</span>
@@ -211,7 +211,7 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 </select>
 <div>
 <label>Upload up to 5 images:</label>
-<input type="file" accept="image/*" multiple onchange="uploadImagesCloudinary(event)">
+<input type="file" accept="image/*" multiple onchange="uploadImages(event)">
 <div class="previewContainer" id="previewContainer"></div>
 </div>
 <div style="margin-bottom:12px;">
@@ -227,13 +227,18 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 </div>
 
 <script>
-let currentAvatar = "";
-let currentImages = [];
-let editIndex = null;
+/* ---------- Utilities ---------- */
+function showMessage(id,msg){
+  const el=document.getElementById(id);
+  el.textContent=msg; el.style.display='block';
+  setTimeout(()=>{el.style.display='none';},2500);
+}
+function logout(){alert("Logged out!"); location.reload();}
 
 /* ---------- Profile ---------- */
+let currentAvatar = "";
 function loadProfile(){
-  const profile = JSON.parse(localStorage.getItem('profile')) || {name:"Artisan", bio:"Handmade creator at AaMilNa", avatar:"https://via.placeholder.com/150"};
+  const profile = JSON.parse(localStorage.getItem('profile')) || {name:"Artisan", bio:"Handmade creator", avatar:"https://via.placeholder.com/150"};
   document.getElementById('avatar').src = profile.avatar;
   document.getElementById('pName').textContent = profile.name;
   document.getElementById('pBio').textContent = profile.bio;
@@ -242,204 +247,153 @@ function loadProfile(){
 }
 function loadAvatar(e){
   const reader = new FileReader();
-  reader.onload = ()=>{currentAvatar = reader.result; document.getElementById('avatar').src = currentAvatar;}
+  reader.onload = ()=>{currentAvatar=reader.result; document.getElementById('avatar').src=currentAvatar;}
   reader.readAsDataURL(e.target.files[0]);
 }
 function saveProfile(){
-  const name = document.getElementById('nameInput').value.trim() || "Artisan";
-  const bio = document.getElementById('bioInput').value.trim() || "Handmade creator at AaMilNa";
-  const avatar = currentAvatar || document.getElementById('avatar').src;
-  localStorage.setItem('profile', JSON.stringify({name,bio,avatar}));
+  const profile={name:document.getElementById('nameInput').value.trim()||"Artisan", bio:document.getElementById('bioInput').value.trim()||"Handmade creator", avatar:currentAvatar||document.getElementById('avatar').src};
+  localStorage.setItem('profile', JSON.stringify(profile));
   loadProfile();
-  showMessage('profileMsg','Profile updated successfully!');
+  showMessage('profileMsg','Profile updated!');
   profileModal.style.display='none';
 }
 
 /* ---------- EasyPaisa ---------- */
 function loadEasyPaisa(){
-  const ep = JSON.parse(localStorage.getItem('easyPaisa')) || {name:'',number:'',email:''};
-  document.getElementById('epName').value = ep.name;
-  document.getElementById('epNumber').value = ep.number;
-  document.getElementById('epEmail').value = ep.email;
+  const ep=JSON.parse(localStorage.getItem('easyPaisa'))||{name:'',number:'',email:''};
+  document.getElementById('epName').value=ep.name;
+  document.getElementById('epNumber').value=ep.number;
+  document.getElementById('epEmail').value=ep.email;
 }
 function saveEasyPaisa(){
-  const name = document.getElementById('epName').value.trim();
-  const number = document.getElementById('epNumber').value.trim();
-  const email = document.getElementById('epEmail').value.trim();
-  if(!name || !number || !email){alert("All EasyPaisa fields are required!"); return;}
-  localStorage.setItem('easyPaisa', JSON.stringify({name,number,email}));
-  showMessage('epMsg','EasyPaisa details saved!');
+  const ep={name:document.getElementById('epName').value.trim(), number:document.getElementById('epNumber').value.trim(), email:document.getElementById('epEmail').value.trim()};
+  if(!ep.name||!ep.number||!ep.email){alert("All EasyPaisa fields required!"); return;}
+  localStorage.setItem('easyPaisa', JSON.stringify(ep));
+  showMessage('epMsg','EasyPaisa saved!');
 }
 
 /* ---------- Products ---------- */
+let editIndex = null, currentImages=[];
 function loadProducts(){
-  const products = JSON.parse(localStorage.getItem('products')) || [];
-  const container = document.getElementById('productList');
-  container.innerHTML = "";
-  if(products.length===0){container.innerHTML="<div class='loading'>No products yet.</div>";return;}
+  const products = JSON.parse(localStorage.getItem('products'))||[];
+  const container=document.getElementById('productList');
+  container.innerHTML="";
+  if(!products.length){container.innerHTML="<div class='loading'>No products yet.</div>"; return;}
   products.forEach((p,i)=>{
-    const div = document.createElement('div');
-    div.className="product";
-    div.innerHTML=`
-      <img src="${p.images && p.images.length ? p.images[0] : 'https://via.placeholder.com/300'}">
-      <h4>${p.name}</h4>
-      <div class="product-price"><span>PKR</span>${p.price}</div>
-      <div class="product-status">Status: ${p.status}</div>
-      <div class="product-likes">Likes: ${p.likes||0}</div>
-      <div class="controls">
-        <button class="edit" onclick="openProduct(${i})">Edit</button>
-        <button class="delete" onclick="deleteProduct(${i})">Delete</button>
-      </div>
-    `;
+    const div=document.createElement('div'); div.className='product';
+    div.innerHTML=`<img src="${p.images[0]||'https://via.placeholder.com/300'}">
+    <h4>${p.name}</h4>
+    <div class="product-price"><span>PKR</span>${p.price}</div>
+    <div class="product-status">Status: ${p.status}</div>
+    <div class="product-likes">Likes: ${p.likes||0}</div>
+    <div class="controls">
+      <button class="edit" onclick="openProduct(${i})">Edit</button>
+      <button class="delete" onclick="deleteProduct(${i})">Delete</button>
+    </div>`;
     container.appendChild(div);
   });
 }
 
-function openProduct(index=null){
-  editIndex = index;
-  if(index!==null){
-    const products = JSON.parse(localStorage.getItem('products')) || [];
-    const p = products[index];
-    document.getElementById('prodName').value = p.name;
-    document.getElementById('prodDesc').value = p.description;
-    document.getElementById('prodPrice').value = p.price;
-    document.getElementById('prodCategory').value = p.category;
-    document.getElementById('prodStatus').value = p.status;
-    currentImages = p.images || [];
-  } else {
-    document.getElementById('prodName').value = '';
-    document.getElementById('prodDesc').value = '';
-    document.getElementById('prodPrice').value = '';
-    document.getElementById('prodCategory').value = '';
-    document.getElementById('prodStatus').value = 'open';
-    currentImages = [];
-  }
-  document.getElementById('previewContainer').innerHTML = currentImages.map(img=>`<img src="${img}" class="previewImg">`).join('');
+function openProduct(i=null){
+  editIndex=i;
+  const products=JSON.parse(localStorage.getItem('products'))||[];
+  if(i!==null){
+    const p=products[i];
+    document.getElementById('prodName').value=p.name;
+    document.getElementById('prodDesc').value=p.description;
+    document.getElementById('prodPrice').value=p.price;
+    document.getElementById('prodCategory').value=p.category;
+    document.getElementById('prodStatus').value=p.status;
+    currentImages=p.images||[];
+  } else {document.getElementById('prodName').value=''; document.getElementById('prodDesc').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodCategory').value=''; document.getElementById('prodStatus').value='open'; currentImages=[];}
+  document.getElementById('previewContainer').innerHTML=currentImages.map(img=>`<img src="${img}" class="previewImg">`).join('');
   productModal.style.display='flex';
 }
 
 function saveProduct(){
-  const name = document.getElementById('prodName').value.trim();
-  const description = document.getElementById('prodDesc').value.trim();
-  const price = parseInt(document.getElementById('prodPrice').value) || 0;
-  const category = document.getElementById('prodCategory').value;
-  const status = document.getElementById('prodStatus').value;
-  if(!name){alert("Product name is required!"); return;}
-  const products = JSON.parse(localStorage.getItem('products')) || [];
-  const productData = {name,description,price,category,status,images:currentImages,likes:0};
-  if(editIndex!==null) products[editIndex]=productData; else products.push(productData);
+  const p={name:document.getElementById('prodName').value.trim(), description:document.getElementById('prodDesc').value.trim(), price:parseInt(document.getElementById('prodPrice').value)||0, category:document.getElementById('prodCategory').value, status:document.getElementById('prodStatus').value, images:currentImages, likes:0};
+  if(!p.name){alert("Product name required!"); return;}
+  const products=JSON.parse(localStorage.getItem('products'))||[];
+  if(editIndex!==null) products[editIndex]=p; else products.push(p);
   localStorage.setItem('products', JSON.stringify(products));
   loadProducts();
-  showMessage('productMsg','Product saved successfully!');
+  showMessage('productMsg','Product saved!');
   productModal.style.display='none';
 }
 
-function deleteProduct(index){
-  if(!confirm("Are you sure you want to delete this product?")) return;
-  const products = JSON.parse(localStorage.getItem('products')) || [];
-  products.splice(index,1);
+function deleteProduct(i){
+  if(!confirm("Delete this product?")) return;
+  const products=JSON.parse(localStorage.getItem('products'))||[];
+  products.splice(i,1);
   localStorage.setItem('products', JSON.stringify(products));
   loadProducts();
+}
+
+function uploadImages(e){
+  const files=Array.from(e.target.files).slice(0,5);
+  const container=document.getElementById('previewContainer'); container.innerHTML=''; currentImages=[];
+  files.forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=()=>{currentImages.push(reader.result); const img=document.createElement('img'); img.src=reader.result; img.className='previewImg'; container.appendChild(img);}
+    reader.readAsDataURL(f);
+  });
 }
 
 /* ---------- Orders ---------- */
 function loadOrders(){
-  const orders = JSON.parse(localStorage.getItem('orders')) || [
-    {id:1,product:"Sample Product",image:"https://via.placeholder.com/80",qty:2,customerName:"Ali Khan",phone:"03001234567",email:"ali@example.com",address:"123 Street, Lahore",status:"Pending"}
-  ];
-  const tbody = document.querySelector("#orderTable tbody");
-  tbody.innerHTML="";
+  const orders = JSON.parse(localStorage.getItem('orders'))||[{id:1,product:"Sample Product",image:"https://via.placeholder.com/80",qty:2,customerName:"Ali Khan",phone:"03001234567",email:"ali@example.com",address:"123 Street, Lahore",status:"Pending"}];
+  localStorage.setItem('orders',JSON.stringify(orders));
+  const tbody=document.querySelector('#orderTable tbody'); tbody.innerHTML='';
   orders.forEach((o,i)=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${o.product}</td>
-      <td><img src="${o.image}" width="60"></td>
-      <td>${o.customerName}</td>
-      <td>${o.phone}</td>
-      <td>${o.email}</td>
-      <td>${o.address}</td>
-      <td>${o.qty}</td>
-      <td>${o.status}</td>
-      <td>
-        ${o.status!=="Completed"?`<button class="completeBtn" onclick="markComplete(${i})">Complete</button>`:""} 
-        <button class="viewBtn" onclick="viewOrder(${i})">View</button>
-      </td>
-    `;
+    tr.innerHTML=`<td>${o.product}</td><td><img src="${o.image}" width="60"></td><td>${o.customerName}</td><td>${o.phone}</td><td>${o.email}</td><td>${o.address}</td><td>${o.qty}</td><td>${o.status}</td><td>${o.status!=="Completed"?`<button class="completeBtn" onclick="markComplete(${i})">Complete</button>`:""} <button class="viewBtn" onclick="viewOrder(${i})">View</button></td>`;
     tbody.appendChild(tr);
   });
 }
 
-function markComplete(index){
-  const orders = JSON.parse(localStorage.getItem('orders')) || [];
-  orders[index].status="Completed";
+function markComplete(i){
+  const orders=JSON.parse(localStorage.getItem('orders'))||[];
+  orders[i].status='Completed';
   localStorage.setItem('orders', JSON.stringify(orders));
   loadOrders();
 }
 
-function viewOrder(index){
-  const orders = JSON.parse(localStorage.getItem('orders')) || [];
-  const o = orders[index];
+function viewOrder(i){
+  const orders=JSON.parse(localStorage.getItem('orders'))||[];
+  const o=orders[i];
   alert(`Order Details:\nProduct: ${o.product}\nQty: ${o.qty}\nCustomer: ${o.customerName}\nPhone: ${o.phone}\nEmail: ${o.email}\nAddress: ${o.address}\nStatus: ${o.status}`);
 }
 
 /* ---------- Delivery Charges ---------- */
 function loadDeliveryCharges(){
-  const charges = JSON.parse(localStorage.getItem('deliveryCharges')) || {};
-  const provinces = ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"];
-  provinces.forEach(p=>{
-    const el=document.getElementById(`del-${p}`);
-    if(el) el.value = charges[p] !== undefined ? charges[p] : 0;
+  const charges=JSON.parse(localStorage.getItem('deliveryCharges'))||{};
+  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{
+    document.getElementById(`del-${p}`).value = charges[p] !== undefined ? charges[p] : 0;
   });
 }
 
 function saveDeliveryCharges(){
-  const provinces = ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"];
-  const charges = {};
-  provinces.forEach(p=>{
-    charges[p] = parseInt(document.getElementById(`del-${p}`).value) || 0;
+  const charges={};
+  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{
+    charges[p]=parseInt(document.getElementById(`del-${p}`).value)||0;
   });
   localStorage.setItem('deliveryCharges', JSON.stringify(charges));
-  showMessage('deliveryMsg','Delivery charges saved successfully!');
-}
-
-/* ---------- Utilities ---------- */
-function showMessage(id,msg){
-  const el = document.getElementById(id);
-  el.textContent=msg; el.style.display='block';
-  setTimeout(()=>{el.style.display='none';},2500);
-}
-
-function logout(){alert("Logged out!");}
-
-/* ---------- Image Upload Preview ---------- */
-function uploadImagesCloudinary(e){
-  const files = e.target.files;
-  const container = document.getElementById('previewContainer');
-  container.innerHTML="";
-  currentImages = [];
-  Array.from(files).slice(0,5).forEach(f=>{
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      currentImages.push(reader.result);
-      const img = document.createElement('img');
-      img.src = reader.result;
-      img.className="previewImg";
-      container.appendChild(img);
-    };
-    reader.readAsDataURL(f);
-  });
+  showMessage('deliveryMsg','Delivery charges saved!');
 }
 
 /* ---------- Initial Load ---------- */
 loadProfile();
+loadEasyPaisa();
 loadProducts();
 loadOrders();
 loadDeliveryCharges();
-loadEasyPaisa();
 </script>
-
 </body>
 </html>
+
+
+
+
 
 
 

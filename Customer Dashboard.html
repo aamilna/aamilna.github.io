@@ -4,12 +4,15 @@
 <meta charset="UTF-8">
 <title>AaMilNa • Customer Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Poppins',sans-serif;background:#fff7f0;color:#4a3b47;overflow-x:hidden;}
 
 .bubble-bg{position:fixed;inset:0;z-index:-1;}
-.bubble{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at top left,rgba(255,255,255,.9),rgba(255,220,230,.45),rgba(200,150,170,.25));animation:float 30s infinite ease-in-out;}
+.bubble{position:absolute;width:260px;height:260px;border-radius:50%;
+background:radial-gradient(circle at top left,rgba(255,255,255,.9),rgba(255,220,230,.45),rgba(200,150,170,.25));
+animation:float 30s infinite ease-in-out;}
 .bubble::after{content:"🌸";display:flex;align-items:center;justify-content:center;height:100%;font-size:70px;opacity:.35;}
 .bubble:nth-child(1){top:8%;left:6%;}
 .bubble:nth-child(2){top:55%;left:70%;}
@@ -39,8 +42,7 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
 .likedItem{background:#fff;padding:15px;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.1);position:relative;}
 .likedItem img{width:100%;height:150px;object-fit:cover;border-radius:16px;}
 
-.heart{position:absolute;top:12px;right:14px;font-size:22px;cursor:pointer;animation:pulse 1.5s infinite;}
-@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);}}
+.heart{position:absolute;top:12px;right:14px;font-size:22px;cursor:pointer;}
 
 .modal{position:fixed;inset:0;background:#00000066;display:none;align-items:center;justify-content:center;}
 .modalContent{background:white;padding:30px;border-radius:26px;width:360px;position:relative;}
@@ -105,7 +107,7 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
 <!-- Profile Modal -->
 <div class="modal" id="profileModal">
 <div class="modalContent">
-<span class="closeBtn" onclick="profileModal.style.display='none'">&times;</span>
+<span class="closeBtn" onclick="closeProfile()">&times;</span>
 <h3>Edit Profile</h3>
 <input id="nameInput" placeholder="Your name">
 <input id="emailInput" placeholder="Your email">
@@ -114,157 +116,152 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
 </div>
 </div>
 
-<!-- Review Modal -->
-<div class="modal" id="reviewModal">
-<div class="modalContent">
-<span class="closeBtn" onclick="reviewModal.style.display='none'">&times;</span>
-<h3>Write Review</h3>
-<textarea id="reviewText" placeholder="Write your review"></textarea>
-<button class="editProfile" onclick="saveReview()">Submit</button>
-</div>
-</div>
-
 <script>
-/* =================================
-   CUSTOMER DASHBOARD WITH PERSISTENT AVATAR
-=================================*/
 
-/* ===== CUSTOMER DATA ===== */
-let customer = JSON.parse(localStorage.getItem("customer")) || {
-    id: "demo_customer_001",
-    name: "AaMilNa Customer",
-    email: "customer@aamilna.com",
-    avatar: "https://via.placeholder.com/150"
-};
+/* ===============================
+   FULL CUSTOMER SYSTEM
+   =============================== */
 
-/* ===== OTHER DATA ===== */
-let orders = JSON.parse(localStorage.getItem("orders")) || [
-    { id:1, customerId:customer.id, productName:"Handmade Vase", status:"Delivered" },
-    { id:2, customerId:customer.id, productName:"Floral Painting", status:"Processing" }
-];
+let currentAvatar = "";
+let customer = null;
 
-let reviews = JSON.parse(localStorage.getItem("reviews")) || [
-    { id:1, customerId:customer.id, text:"Beautiful product!" }
-];
+/* LOAD PROFILE */
+function loadProfile(){
 
-let liked = JSON.parse(localStorage.getItem("likedProducts")) || [
-    { id:1, customerId:customer.id, name:"Ceramic Mug", image:"https://via.placeholder.com/200" }
-];
+    let stored = localStorage.getItem("customer");
 
-/* ===== DOM ELEMENTS ===== */
-const avatarEl = document.getElementById("avatar");
-const cName = document.getElementById("cName");
-const cEmail = document.getElementById("cEmail");
-const nameInput = document.getElementById("nameInput");
-const emailInput = document.getElementById("emailInput");
-const orderList = document.getElementById("orderList");
-const reviewList = document.getElementById("reviewList");
-const likedList = document.getElementById("likedList");
-const reviewText = document.getElementById("reviewText");
-const avatarInput = document.getElementById("avatarInput");
+    if(!stored){
+        const defaultCustomer = {
+            id:"demo_customer_001",
+            name:"AaMilNa Customer",
+            email:"customer@aamilna.com",
+            avatar:"https://via.placeholder.com/150"
+        };
+        localStorage.setItem("customer", JSON.stringify(defaultCustomer));
+        stored = JSON.stringify(defaultCustomer);
+    }
 
-/* ===== INITIAL RENDER ===== */
-renderProfile();
-renderOrders();
-renderReviews();
-renderLiked();
+    customer = JSON.parse(stored);
 
-/* ===== PROFILE FUNCTIONS ===== */
-function renderProfile(){
-    avatarEl.src = customer.avatar;
-    cName.textContent = customer.name;
-    cEmail.textContent = customer.email;
-    localStorage.setItem("customer", JSON.stringify(customer));
+    document.getElementById("avatar").src = customer.avatar;
+    document.getElementById("cName").textContent = customer.name;
+    document.getElementById("cEmail").textContent = customer.email;
+    document.getElementById("nameInput").value = customer.name;
+    document.getElementById("emailInput").value = customer.email;
+
+    currentAvatar = customer.avatar;
 }
 
+/* PROFILE MODAL */
 function openProfile(){
-    profileModal.style.display="flex";
-    nameInput.value = customer.name;
-    emailInput.value = customer.email;
+    document.getElementById("profileModal").style.display="flex";
 }
 
-// Load avatar as Base64 locally
-avatarInput.addEventListener("change", function(e){
+function closeProfile(){
+    document.getElementById("profileModal").style.display="none";
+}
+
+/* AVATAR UPLOAD */
+document.getElementById("avatarInput").addEventListener("change",function(e){
     const file = e.target.files[0];
     if(!file) return;
+
     const reader = new FileReader();
     reader.onload = function(event){
-        customer.avatar = event.target.result;
-        renderProfile();
-    }
+        currentAvatar = event.target.result;
+        document.getElementById("avatar").src = currentAvatar;
+    };
     reader.readAsDataURL(file);
 });
 
+/* SAVE PROFILE */
 function saveProfile(){
-    customer.name = nameInput.value.trim() || customer.name;
-    customer.email = emailInput.value.trim() || customer.email;
-    renderProfile(); // persist to localStorage
-    profileModal.style.display="none";
+
+    customer.name = document.getElementById("nameInput").value.trim() || "AaMilNa Customer";
+    customer.email = document.getElementById("emailInput").value.trim() || "customer@aamilna.com";
+    customer.avatar = currentAvatar;
+
+    localStorage.setItem("customer", JSON.stringify(customer));
+
+    loadProfile();
+    closeProfile();
+    alert("Profile Saved Successfully ✅");
 }
 
-/* ===== ORDERS ===== */
-function renderOrders(){
-    orderList.innerHTML="";
-    orders.filter(o=>o.customerId===customer.id).forEach(o=>{
-        orderList.innerHTML+=`
-        <div class="order">
-        <strong>${o.productName}</strong><br>
-        <small>Status: ${o.status}</small>
-        </div>`;
-    });
+/* ORDER SYSTEM (Demo Persistent) */
+function loadOrders(){
+    const orders = JSON.parse(localStorage.getItem("orders")) || [
+        {id:"#1001",item:"Handmade Vase",date:"2026-02-10"},
+        {id:"#1002",item:"Floral Painting",date:"2026-02-12"}
+    ];
     localStorage.setItem("orders", JSON.stringify(orders));
-}
 
-/* ===== REVIEWS ===== */
-function openReview(){ reviewModal.style.display="flex"; }
-
-function saveReview(){
-    if(!reviewText.value.trim()){ alert("Write something first"); return; }
-    reviews.push({ id:Date.now(), customerId:customer.id, text:reviewText.value });
-    reviewModal.style.display="none";
-    reviewText.value="";
-    renderReviews();
-}
-
-function renderReviews(){
-    reviewList.innerHTML="";
-    reviews.filter(r=>r.customerId===customer.id).forEach(r=>{
-        reviewList.innerHTML+=`<p style="margin-bottom:10px;">"${r.text}"</p>`;
+    const container = document.getElementById("orderList");
+    container.innerHTML="";
+    orders.forEach(o=>{
+        container.innerHTML+=`<div class="order"><strong>${o.id}</strong><br>${o.item}<br><small>${o.date}</small></div>`;
     });
-    localStorage.setItem("reviews", JSON.stringify(reviews));
 }
 
-/* ===== LIKED ITEMS ===== */
-function renderLiked(){
-    likedList.innerHTML="";
-    liked.filter(p=>p.customerId===customer.id).forEach((p,i)=>{
-        likedList.innerHTML+=`
+/* REVIEW SYSTEM */
+function openReview(){
+    const text = prompt("Write your review:");
+    if(!text) return;
+
+    const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+    reviews.push(text);
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+    loadReviews();
+}
+
+function loadReviews(){
+    const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+    const container = document.getElementById("reviewList");
+    container.innerHTML="";
+    reviews.forEach(r=>{
+        container.innerHTML+=`<p>⭐ ${r}</p>`;
+    });
+}
+
+/* LIKED ITEMS */
+function loadLiked(){
+    const liked = JSON.parse(localStorage.getItem("liked")) || [
+        {img:"https://via.placeholder.com/300",name:"Art Piece"}
+    ];
+    localStorage.setItem("liked", JSON.stringify(liked));
+
+    const container = document.getElementById("likedList");
+    container.innerHTML="";
+    liked.forEach(l=>{
+        container.innerHTML+=`
         <div class="likedItem">
-        <span class="heart" onclick="removeLiked(${i})">💖</span>
-        <img src="${p.image}">
-        <h4>${p.name}</h4>
+        <span class="heart">❤️</span>
+        <img src="${l.img}">
+        <p>${l.name}</p>
         </div>`;
     });
-    localStorage.setItem("likedProducts", JSON.stringify(liked));
 }
 
-function removeLiked(index){
-    liked = liked.filter((p,i)=>i!==index);
-    renderLiked();
-}
-
-/* ===== CART (ready for integration) ===== */
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-/* ===== LOGOUT ===== */
+/* LOGOUT */
 function logout(){
-    alert("You are logged out.");
-    // Data persists in localStorage
+    alert("You are logged out. All data remains saved.");
 }
+
+/* INITIAL LOAD */
+window.onload=function(){
+    loadProfile();
+    loadOrders();
+    loadReviews();
+    loadLiked();
+};
+
 </script>
 
 </body>
 </html>
+
+
+
 
 
 
