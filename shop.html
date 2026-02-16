@@ -14,10 +14,10 @@ body{font-family:'Poppins',sans-serif;background:#fff7f0;color:#4a3b47;overflow-
 background:radial-gradient(circle at top left,rgba(255,255,255,0.9),rgba(255,220,230,0.45),rgba(200,150,170,0.25));
 animation:float 30s infinite ease-in-out;}
 .bubble::after{content:"🌸";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:70px;opacity:0.35;}
-.bubble:nth-child(1){top:10%;left:6%;}
-.bubble:nth-child(2){top:55%;left:72%;}
-.bubble:nth-child(3){top:30%;left:42%;}
-@keyframes float{50%{transform:translateY(-60px);}}
+.bubble:nth-child(1){top:10%;left:6%;animation-duration:30s;}
+.bubble:nth-child(2){top:55%;left:72%;animation-duration:36s;}
+.bubble:nth-child(3){top:30%;left:42%;animation-duration:42s;}
+@keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-60px);}100%{transform:translateY(0);}}
 
 /* Header */
 header{
@@ -30,6 +30,7 @@ header{
 }
 header h1{font-family:'Playfair Display',serif;font-style:italic;}
 header a{text-decoration:none;font-weight:500;color:#4a3b47;}
+header a:hover{text-decoration:underline;}
 
 /* Shop Grid */
 .shop{max-width:1200px;margin:20px auto 80px;padding:0 30px;}
@@ -43,13 +44,15 @@ header a{text-decoration:none;font-weight:500;color:#4a3b47;}
   flex-direction:column;
   justify-content:flex-start;
   cursor:pointer;
+  transition:0.3s;
 }
+.card:hover{transform:translateY(-5px);}
 
 /* Gallery */
 .gallery-container{
   position:relative;
   width:100%;
-  height:190px;
+  aspect-ratio: 16/9;
   margin-bottom:10px;
   overflow:hidden;
   border-radius:18px;
@@ -86,12 +89,15 @@ header a{text-decoration:none;font-weight:500;color:#4a3b47;}
   gap:8px;
   margin-bottom:10px;
 }
-.heart{
-  color:#ccc;
+.heart-btn{
   font-size:20px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#ccc;
   transition: transform 0.3s, color 0.3s;
 }
-.heart.liked{
+.heart-btn.liked{
   color:#e74c3c;
   transform: scale(1.3);
   animation:pop 0.3s forwards;
@@ -122,6 +128,22 @@ header a{text-decoration:none;font-weight:500;color:#4a3b47;}
   transition:.3s;
 }
 .card button.add-cart:hover{background:#dca6b9;}
+
+/* Toast */
+#toast{
+  position:fixed;
+  bottom:25px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#e7b7c8;
+  padding:12px 22px;
+  border-radius:20px;
+  color:#4a3b47;
+  font-weight:500;
+  display:none;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  z-index:1000;
+}
 </style>
 </head>
 
@@ -135,23 +157,36 @@ header a{text-decoration:none;font-weight:500;color:#4a3b47;}
 
 <header>
   <h1>Shop</h1>
-  <a href="cart.html">🛒 Cart</a>
+  <a href="cart.html" aria-label="View Cart">🛒 Cart</a>
 </header>
 
 <section class="shop">
   <div class="grid" id="shopGrid"></div>
 </section>
 
+<div id="toast">Added to cart</div>
+
 <script>
 // --- GET PRODUCTS ---
 let allProducts = JSON.parse(localStorage.getItem("allProducts")) || [];
+
+// Ensure unique IDs
+allProducts.forEach((p, idx)=>{ if(!p.id) p.id = 'prod_'+idx; });
 
 // Filter approved products, fallback to all if none match
 let approvedProducts = allProducts.filter(p => p.statusAdmin === "Approved");
 if(approvedProducts.length === 0) approvedProducts = allProducts;
 
-// Initialize likes if missing
-approvedProducts.forEach(p => { if(p.likes === undefined) p.likes = 0; });
+// Initialize likes
+approvedProducts.forEach(p => { if(p.likes === undefined) p.likes = 0; if(p.liked === undefined) p.liked = false; });
+
+// --- SHOW TOAST ---
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.display='block';
+  setTimeout(()=>{ toast.style.display='none'; },1200);
+}
 
 // --- RENDER SHOP ---
 function renderShop(){
@@ -163,19 +198,19 @@ function renderShop(){
     card.className = "card";
 
     let currentIndex = 0;
-    const images = (p.images && p.images.length) ? p.images : ["https://via.placeholder.com/300"];
+    const images = (p.images && p.images.length) ? p.images : ["https://via.placeholder.com/300x190?text=No+Image"];
 
     card.innerHTML = `
       <div class="gallery-container">
-        <img src="${images[0]}" alt="${p.name}">
+        <img src="${images[0]}" alt="Image of ${p.name}">
         ${images.length>1 ? '<button class="gallery-btn prev">&#10094;</button><button class="gallery-btn next">&#10095;</button>' : ''}
       </div>
       <div class="likes-container">
-        <span class="heart ${p.liked?'liked':''}">❤️</span>
+        <button class="heart-btn ${p.liked?'liked':''}" aria-pressed="${p.liked?'true':'false'}">❤️</button>
         <span class="likes-count">${p.likes}</span>
       </div>
       <h4>${p.name}</h4>
-      <p>PKR ${p.price}</p>
+      <p>PKR ${Number(p.price).toLocaleString()}</p>
       <p>By ${p.artisanName || "Unknown Artisan"}</p>
       <button class="add-cart">Add to Cart</button>
     `;
@@ -184,48 +219,45 @@ function renderShop(){
     const prevBtn = card.querySelector(".gallery-btn.prev");
     const nextBtn = card.querySelector(".gallery-btn.next");
     const addCartBtn = card.querySelector(".add-cart");
-    const heart = card.querySelector(".heart");
+    const heartBtn = card.querySelector(".heart-btn");
     const count = card.querySelector(".likes-count");
 
     // --- Gallery Navigation ---
     if(images.length > 1){
-      prevBtn.onclick = e => { e.stopPropagation(); currentIndex=(currentIndex-1+images.length)%images.length; galleryImg.src=images[currentIndex]; }
-      nextBtn.onclick = e => { e.stopPropagation(); currentIndex=(currentIndex+1)%images.length; galleryImg.src=images[currentIndex]; }
+      prevBtn.onclick = e => { e.stopPropagation(); currentIndex=(currentIndex-1+images.length)%images.length; galleryImg.src=images[currentIndex]; };
+      nextBtn.onclick = e => { e.stopPropagation(); currentIndex=(currentIndex+1)%images.length; galleryImg.src=images[currentIndex]; };
     }
 
     // --- Touch Swipe ---
-    let startX = 0;
-    galleryImg.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    let startX=0, startY=0;
+    galleryImg.addEventListener("touchstart", e => { startX=e.touches[0].clientX; startY=e.touches[0].clientY; });
     galleryImg.addEventListener("touchend", e => {
-      const diff = e.changedTouches[0].clientX - startX;
-      if(Math.abs(diff) > 40){
-        currentIndex = diff>0 ? (currentIndex-1+images.length)%images.length : (currentIndex+1)%images.length;
-        galleryImg.src = images[currentIndex];
+      const diffX = e.changedTouches[0].clientX - startX;
+      const diffY = e.changedTouches[0].clientY - startY;
+      if(Math.abs(diffX)>40 && Math.abs(diffX)>Math.abs(diffY)){
+        currentIndex = diffX>0 ? (currentIndex-1+images.length)%images.length : (currentIndex+1)%images.length;
+        galleryImg.src=images[currentIndex];
       }
     });
 
     // --- Heart Like ---
-    heart.onclick = e => {
+    heartBtn.onclick = e => {
       e.stopPropagation();
-      if(heart.classList.contains("liked")){
-        heart.classList.remove("liked");
-        p.likes = Math.max(0, p.likes-1);
-        p.liked = false;
+      if(heartBtn.classList.contains("liked")){
+        heartBtn.classList.remove("liked");
+        heartBtn.setAttribute("aria-pressed","false");
+        p.likes = Math.max(0,p.likes-1);
+        p.liked=false;
       } else {
-        heart.classList.add("liked");
-        p.likes += 1;
-        p.liked = true;
+        heartBtn.classList.add("liked");
+        heartBtn.setAttribute("aria-pressed","true");
+        p.likes+=1;
+        p.liked=true;
       }
       count.textContent = p.likes;
 
-      // Save to localStorage
       const updatedProducts = JSON.parse(localStorage.getItem("allProducts")) || [];
-      updatedProducts.forEach(ap => {
-        if(ap.name === p.name && ap.artisanName === p.artisanName){
-          ap.likes = p.likes;
-          ap.liked = p.liked;
-        }
-      });
+      updatedProducts.forEach(ap => { if(ap.id===p.id){ ap.likes=p.likes; ap.liked=p.liked; } });
       localStorage.setItem("allProducts", JSON.stringify(updatedProducts));
     };
 
@@ -233,11 +265,11 @@ function renderShop(){
     addCartBtn.onclick = e => {
       e.stopPropagation();
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existing = cart.find(i => i.name===p.name && i.artisanName===p.artisanName);
-      if(existing){ existing.qty += 1; }
-      else{ cart.push({ name:p.name, price:p.price, image:images[0], artisanName:p.artisanName, qty:1 }); }
+      const existing = cart.find(i=>i.id===p.id);
+      if(existing){ existing.qty+=1; }
+      else{ cart.push({ id:p.id, name:p.name, price:p.price, image:images[0], artisanName:p.artisanName, qty:1 }); }
       localStorage.setItem("cart", JSON.stringify(cart));
-      alert("Added to cart");
+      showToast("Added to cart");
     };
 
     // --- Click to Product Page ---
@@ -256,6 +288,7 @@ renderShop();
 
 </body>
 </html>
+
 
 
 
