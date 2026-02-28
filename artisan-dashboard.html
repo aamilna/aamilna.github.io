@@ -7,7 +7,6 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Poppins',sans-serif;background:#fff7f0;color:#4a3b47;overflow-x:hidden;}
-
 /* Background Bubbles */
 .bubble-bg{position:fixed;inset:0;z-index:-1;}
 .bubble{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at top left,rgba(255,255,255,.9),rgba(255,220,230,.45),rgba(200,150,170,.25));animation:float 30s infinite ease-in-out;}
@@ -226,8 +225,25 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 </div>
 </div>
 
-<script>
-/* ---------- Utilities ---------- */
+<!-- Firebase & Cloudinary Scripts -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+// ----------------- Firebase Config -----------------
+const firebaseConfig = {
+  apiKey: "AIzaSyCHMIBHlYGqyw4U7ZZplwi4LgQxga99nLM",
+  authDomain: "aamilna.firebaseapp.com",
+  projectId: "aamilna",
+  storageBucket: "aamilna.appspot.com",
+  messagingSenderId: "127180284017",
+  appId: "1:127180284017:web:b024e50670228b085f7bd0",
+  measurementId: "G-K27L27BHDB"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ----------------- Utilities -----------------
 function showMessage(id,msg){
   const el=document.getElementById(id);
   el.textContent=msg; el.style.display='block';
@@ -235,51 +251,55 @@ function showMessage(id,msg){
 }
 function logout(){alert("Logged out!"); location.reload();}
 
-/* ---------- Profile ---------- */
-let currentAvatar = "";
-function loadProfile(){
-  const profile = JSON.parse(localStorage.getItem('profile')) || {name:"Artisan", bio:"Handmade creator", avatar:"https://via.placeholder.com/150"};
-  document.getElementById('avatar').src = profile.avatar;
-  document.getElementById('pName').textContent = profile.name;
-  document.getElementById('pBio').textContent = profile.bio;
-  document.getElementById('nameInput').value = profile.name;
-  document.getElementById('bioInput').value = profile.bio;
+// ----------------- Profile -----------------
+let currentAvatar="";
+async function loadProfile(){
+  const docRef = doc(db,"artisans","profile");
+  const docSnap = await getDoc(docRef);
+  const profile = docSnap.exists() ? docSnap.data() : {name:"Artisan", bio:"Handmade creator", avatar:"https://via.placeholder.com/150"};
+  document.getElementById('avatar').src=profile.avatar;
+  document.getElementById('pName').textContent=profile.name;
+  document.getElementById('pBio').textContent=profile.bio;
+  document.getElementById('nameInput').value=profile.name;
+  document.getElementById('bioInput').value=profile.bio;
 }
 function loadAvatar(e){
-  const reader = new FileReader();
-  reader.onload = ()=>{currentAvatar=reader.result; document.getElementById('avatar').src=currentAvatar;}
+  const reader=new FileReader();
+  reader.onload=()=>{currentAvatar=reader.result; document.getElementById('avatar').src=currentAvatar;}
   reader.readAsDataURL(e.target.files[0]);
 }
-function saveProfile(){
+async function saveProfile(){
   const profile={name:document.getElementById('nameInput').value.trim()||"Artisan", bio:document.getElementById('bioInput').value.trim()||"Handmade creator", avatar:currentAvatar||document.getElementById('avatar').src};
-  localStorage.setItem('profile', JSON.stringify(profile));
-  loadProfile();
-  showMessage('profileMsg','Profile updated!');
+  await setDoc(doc(db,"artisans","profile"),profile);
+  loadProfile(); showMessage('profileMsg','Profile updated!');
   profileModal.style.display='none';
 }
 
-/* ---------- EasyPaisa ---------- */
-function loadEasyPaisa(){
-  const ep=JSON.parse(localStorage.getItem('easyPaisa'))||{name:'',number:'',email:''};
+// ----------------- EasyPaisa -----------------
+async function loadEasyPaisa(){
+  const docRef=doc(db,"artisans","easyPaisa");
+  const docSnap=await getDoc(docRef);
+  const ep=docSnap.exists()?docSnap.data():{name:'',number:'',email:''};
   document.getElementById('epName').value=ep.name;
   document.getElementById('epNumber').value=ep.number;
   document.getElementById('epEmail').value=ep.email;
 }
-function saveEasyPaisa(){
+async function saveEasyPaisa(){
   const ep={name:document.getElementById('epName').value.trim(), number:document.getElementById('epNumber').value.trim(), email:document.getElementById('epEmail').value.trim()};
   if(!ep.name||!ep.number||!ep.email){alert("All EasyPaisa fields required!"); return;}
-  localStorage.setItem('easyPaisa', JSON.stringify(ep));
+  await setDoc(doc(db,"artisans","easyPaisa"),ep);
   showMessage('epMsg','EasyPaisa saved!');
 }
 
-/* ---------- Products ---------- */
-let editIndex = null, currentImages=[];
-function loadProducts(){
-  const products = JSON.parse(localStorage.getItem('products'))||[];
+// ----------------- Products -----------------
+let editIndex=null, currentImages=[];
+async function loadProducts(){
   const container=document.getElementById('productList');
   container.innerHTML="";
-  if(!products.length){container.innerHTML="<div class='loading'>No products yet.</div>"; return;}
-  products.forEach((p,i)=>{
+  const querySnapshot = await getDocs(collection(db,"products"));
+  if(querySnapshot.empty){container.innerHTML="<div class='loading'>No products yet.</div>"; return;}
+  querySnapshot.forEach((docSnap)=>{
+    const p=docSnap.data(); const i=docSnap.id;
     const div=document.createElement('div'); div.className='product';
     div.innerHTML=`<img src="${p.images[0]||'https://via.placeholder.com/300'}">
     <h4>${p.name}</h4>
@@ -287,109 +307,84 @@ function loadProducts(){
     <div class="product-status">Status: ${p.status}</div>
     <div class="product-likes">Likes: ${p.likes||0}</div>
     <div class="controls">
-      <button class="edit" onclick="openProduct(${i})">Edit</button>
-      <button class="delete" onclick="deleteProduct(${i})">Delete</button>
+      <button class="edit" onclick="openProduct('${i}')">Edit</button>
+      <button class="delete" onclick="deleteProduct('${i}')">Delete</button>
     </div>`;
     container.appendChild(div);
   });
 }
-
-function openProduct(i=null){
-  editIndex=i;
-  const products=JSON.parse(localStorage.getItem('products'))||[];
-  if(i!==null){
-    const p=products[i];
-    document.getElementById('prodName').value=p.name;
-    document.getElementById('prodDesc').value=p.description;
-    document.getElementById('prodPrice').value=p.price;
-    document.getElementById('prodCategory').value=p.category;
-    document.getElementById('prodStatus').value=p.status;
-    currentImages=p.images||[];
-  } else {document.getElementById('prodName').value=''; document.getElementById('prodDesc').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodCategory').value=''; document.getElementById('prodStatus').value='open'; currentImages=[];}
-  document.getElementById('previewContainer').innerHTML=currentImages.map(img=>`<img src="${img}" class="previewImg">`).join('');
+function openProduct(id=null){
+  editIndex=id;
+  document.getElementById('previewContainer').innerHTML="";
+  currentImages=[];
+  if(id){
+    getDoc(doc(db,"products",id)).then(docSnap=>{
+      if(docSnap.exists()){
+        const p=docSnap.data();
+        document.getElementById('prodName').value=p.name;
+        document.getElementById('prodDesc').value=p.description;
+        document.getElementById('prodPrice').value=p.price;
+        document.getElementById('prodCategory').value=p.category;
+        document.getElementById('prodStatus').value=p.status;
+        currentImages=p.images||[];
+        document.getElementById('previewContainer').innerHTML=currentImages.map(img=>`<img src="${img}" class="previewImg">`).join('');
+      }
+    });
+  } else {document.getElementById('prodName').value=''; document.getElementById('prodDesc').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodCategory').value=''; document.getElementById('prodStatus').value='open';}
   productModal.style.display='flex';
 }
-
-function saveProduct(){
-  const p={name:document.getElementById('prodName').value.trim(), description:document.getElementById('prodDesc').value.trim(), price:parseInt(document.getElementById('prodPrice').value)||0, category:document.getElementById('prodCategory').value, status:document.getElementById('prodStatus').value, images:currentImages, likes:0};
-  if(!p.name){alert("Product name required!"); return;}
-  const products=JSON.parse(localStorage.getItem('products'))||[];
-  if(editIndex!==null) products[editIndex]=p; else products.push(p);
-  localStorage.setItem('products', JSON.stringify(products));
-  loadProducts();
-  showMessage('productMsg','Product saved!');
-  productModal.style.display='none';
+async function saveProduct(){
+  const name=document.getElementById('prodName').value.trim();
+  if(!name){alert("Product name required!"); return;}
+  const p={name, description:document.getElementById('prodDesc').value.trim(), price:parseInt(document.getElementById('prodPrice').value)||0, category:document.getElementById('prodCategory').value, status:document.getElementById('prodStatus').value, images:currentImages, likes:0};
+  if(editIndex){await setDoc(doc(db,"products",editIndex),p);} 
+  else{await setDoc(doc(db,"products",Date.now().toString()),p);}
+  loadProducts(); showMessage('productMsg','Product saved!'); productModal.style.display='none';
 }
-
-function deleteProduct(i){
+async function deleteProduct(id){
   if(!confirm("Delete this product?")) return;
-  const products=JSON.parse(localStorage.getItem('products'))||[];
-  products.splice(i,1);
-  localStorage.setItem('products', JSON.stringify(products));
+  await updateDoc(doc(db,"products",id),{deleted:true});
   loadProducts();
 }
 
-function uploadImages(e){
+// ----------------- Cloudinary Upload -----------------
+async function uploadImages(e){
   const files=Array.from(e.target.files).slice(0,5);
   const container=document.getElementById('previewContainer'); container.innerHTML=''; currentImages=[];
-  files.forEach(f=>{
-    const reader=new FileReader();
-    reader.onload=()=>{currentImages.push(reader.result); const img=document.createElement('img'); img.src=reader.result; img.className='previewImg'; container.appendChild(img);}
-    reader.readAsDataURL(f);
-  });
+  for(const file of files){
+    const formData=new FormData();
+    formData.append("file",file);
+    formData.append("upload_preset","aamilna_unsigned");
+    const res=await fetch("https://api.cloudinary.com/v1_1/dfmpbdhrv/image/upload",{method:"POST",body:formData});
+    const data=await res.json();
+    currentImages.push(data.secure_url);
+    const img=document.createElement('img'); img.src=data.secure_url; img.className='previewImg'; container.appendChild(img);
+  }
 }
 
-/* ---------- Orders ---------- */
-function loadOrders(){
-  const orders = JSON.parse(localStorage.getItem('orders'))||[{id:1,product:"Sample Product",image:"https://via.placeholder.com/80",qty:2,customerName:"Ali Khan",phone:"03001234567",email:"ali@example.com",address:"123 Street, Lahore",status:"Pending"}];
-  localStorage.setItem('orders',JSON.stringify(orders));
-  const tbody=document.querySelector('#orderTable tbody'); tbody.innerHTML='';
-  orders.forEach((o,i)=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${o.product}</td><td><img src="${o.image}" width="60"></td><td>${o.customerName}</td><td>${o.phone}</td><td>${o.email}</td><td>${o.address}</td><td>${o.qty}</td><td>${o.status}</td><td>${o.status!=="Completed"?`<button class="completeBtn" onclick="markComplete(${i})">Complete</button>`:""} <button class="viewBtn" onclick="viewOrder(${i})">View</button></td>`;
-    tbody.appendChild(tr);
-  });
+// ----------------- Delivery Charges -----------------
+async function loadDeliveryCharges(){
+  const docRef=doc(db,"artisans","deliveryCharges");
+  const docSnap=await getDoc(docRef);
+  const charges=docSnap.exists()?docSnap.data():{};
+  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{document.getElementById(`del-${p}`).value=charges[p]||0;});
 }
-
-function markComplete(i){
-  const orders=JSON.parse(localStorage.getItem('orders'))||[];
-  orders[i].status='Completed';
-  localStorage.setItem('orders', JSON.stringify(orders));
-  loadOrders();
-}
-
-function viewOrder(i){
-  const orders=JSON.parse(localStorage.getItem('orders'))||[];
-  const o=orders[i];
-  alert(`Order Details:\nProduct: ${o.product}\nQty: ${o.qty}\nCustomer: ${o.customerName}\nPhone: ${o.phone}\nEmail: ${o.email}\nAddress: ${o.address}\nStatus: ${o.status}`);
-}
-
-/* ---------- Delivery Charges ---------- */
-function loadDeliveryCharges(){
-  const charges=JSON.parse(localStorage.getItem('deliveryCharges'))||{};
-  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{
-    document.getElementById(`del-${p}`).value = charges[p] !== undefined ? charges[p] : 0;
-  });
-}
-
-function saveDeliveryCharges(){
+async function saveDeliveryCharges(){
   const charges={};
-  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{
-    charges[p]=parseInt(document.getElementById(`del-${p}`).value)||0;
-  });
-  localStorage.setItem('deliveryCharges', JSON.stringify(charges));
+  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{charges[p]=parseInt(document.getElementById(`del-${p}`).value)||0;});
+  await setDoc(doc(db,"artisans","deliveryCharges"),charges);
   showMessage('deliveryMsg','Delivery charges saved!');
 }
 
-/* ---------- Initial Load ---------- */
+// ----------------- Initial Load -----------------
 loadProfile();
 loadEasyPaisa();
 loadProducts();
-loadOrders();
 loadDeliveryCharges();
 </script>
 </body>
 </html>
+
 
 
 
