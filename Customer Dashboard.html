@@ -22,7 +22,8 @@ body{font-family:'Poppins',sans-serif;background:#fff7f0;color:#4a3b47;overflow-
 header{display:flex;justify-content:space-between;align-items:center;padding:22px 50px;background:rgba(255,255,255,.85);}
 header img{height:90px;cursor:pointer;}
 header .actions{display:flex;gap:12px;}
-header button{background:#d8a7a0;border:none;padding:10px 22px;border-radius:30px;cursor:pointer;}
+header button{background:#d8a7a0;border:none;padding:10px 22px;border-radius:30px;cursor:pointer;color:#4a3b47;font-weight:500;transition:0.3s;}
+header button:hover{background:#c8928a;}
 
 /* Dashboard Layout */
 .dashboard{max-width:1300px;margin:120px auto 80px;padding:0 30px;}
@@ -31,7 +32,8 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
 /* Profile Box */
 .profileBox{display:flex;gap:20px;align-items:flex-start;}
 .avatar{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #d8a7a0;}
-.editProfile{margin-top:10px;background:#d8a7a0;border:none;padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;}
+.editProfile{margin-top:10px;background:#d8a7a0;border:none;padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;color:#4a3b47;font-weight:500;transition:0.3s;}
+.editProfile:hover{background:#c8928a;}
 
 /* Profile Summary Card */
 .profileSummary{background:#fff;padding:20px;border-radius:22px;box-shadow:0 15px 30px rgba(0,0,0,.12);margin-top:10px;display:flex;flex-direction:column;gap:8px;font-size:14px;}
@@ -53,9 +55,10 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
 .heart{position:absolute;top:12px;right:14px;font-size:22px;cursor:pointer;}
 
 /* Modals */
-.modal{position:fixed;inset:0;background:#00000066;display:none;align-items:center;justify-content:center;}
-.modalContent{background:white;padding:30px;border-radius:26px;width:400px;position:relative;}
-.modalContent input{width:100%;margin-bottom:10px;padding:8px;border-radius:12px;border:1px solid #ddd;}
+.modal{position:fixed;inset:0;background:#00000066;display:none;align-items:center;justify-content:center;z-index:9999;}
+.modalContent{background:white;padding:30px;border-radius:26px;width:400px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,0.2);}
+.modalContent input{width:100%;margin-bottom:10px;padding:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins';}
+.modalContent h3{margin-bottom:15px;color:#4a3b47;}
 .closeBtn{position:absolute;top:12px;right:16px;font-size:20px;cursor:pointer;color:#b96a6a;}
 .emptyState{opacity:.6;font-size:14px;}
 </style>
@@ -98,13 +101,17 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
     <!-- Orders Section -->
     <div class="box">
       <h3>🛍 Order History</h3><br>
-      <div class="orders" id="orderList"></div>
+      <div class="orders" id="orderList">
+        <p class="emptyState">No orders found.</p>
+      </div>
     </div>
 
     <!-- Reviews Section -->
     <div class="box">
       <h3>⭐ Your Reviews</h3><br>
-      <div id="reviewList"></div>
+      <div id="reviewList">
+         <p class="emptyState">No reviews yet.</p>
+      </div>
       <button class="editProfile" onclick="openReview()">Write Review</button>
     </div>
   </div>
@@ -113,7 +120,9 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
     <!-- Liked Items -->
     <div class="box">
       <h3>❤️ Liked Items</h3><br>
-      <div class="likedGrid" id="likedList"></div>
+      <div class="likedGrid" id="likedList">
+         <p class="emptyState">No liked items yet.</p>
+      </div>
     </div>
 
     <!-- Payments Section -->
@@ -135,12 +144,13 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
 <h3>Edit Profile</h3>
 <input id="nameInput" placeholder="Your Name">
 <input id="phoneInput" placeholder="Phone Number">
-<input id="emailInput" placeholder="Email">
+<input id="emailInput" placeholder="Email" disabled style="background:#eee;color:#888;">
 <input id="countryInput" placeholder="Country">
 <input id="cityInput" placeholder="City">
 <input id="addressInput" placeholder="Home Address">
+<label style="font-size:12px;color:#888;">Change Profile Photo:</label>
 <input type="file" accept="image/*" id="avatarInput">
-<button class="editProfile" onclick="saveProfile()">Save</button>
+<button class="editProfile" onclick="saveProfile()" style="width:100%;margin-top:10px;">Save Changes</button>
 </div>
 </div>
 
@@ -151,14 +161,25 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;}
 <h3>EasyPaisa Account</h3>
 <input id="easypaisaInput" placeholder="EasyPaisa Account Number">
 <input id="accountHolderInput" placeholder="Account Holder Name">
-<button class="editProfile" onclick="savePayment()">Save</button>
+<button class="editProfile" onclick="savePayment()" style="width:100%;margin-top:10px;">Save</button>
+</div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal" id="reviewModal">
+<div class="modalContent">
+<span class="closeBtn" onclick="closeReview()">&times;</span>
+<h3>Write a Review</h3>
+<input id="reviewProductInput" placeholder="Product Name">
+<textarea id="reviewTextInput" style="width:100%;height:80px;border-radius:12px;border:1px solid #ddd;padding:10px;font-family:'Poppins';" placeholder="Your thoughts..."></textarea>
+<button class="editProfile" onclick="saveReview()" style="width:100%;margin-top:10px;">Submit Review</button>
 </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHMIBHlYGqyw4U7ZZplwi4LgQxga99nLM",
@@ -173,6 +194,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// YOUR CLOUDINARY CONFIG
 const CLOUD_NAME = "dfmpbdhrv";
 const UPLOAD_PRESET = "aamilna_unsigned";
 
@@ -181,7 +203,7 @@ let currentAvatar = "";
 
 const avatarImg = document.getElementById("avatar");
 
-// 🚀 Load current customer
+// 🚀 Auth State & Load Data
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
         window.location.href = "customer-login.html";
@@ -198,24 +220,57 @@ onAuthStateChanged(auth, async (user) => {
     customer = docSnap.data();
     customer.id = user.uid;
     currentAvatar = customer.avatar || "https://via.placeholder.com/150";
+    
     loadProfileUI();
+    syncLocalStorage(); // Sync immediately on load
     loadOrders();
     loadReviews();
     loadLiked();
 });
 
-// 🖼 Avatar upload
+// 🖼 Avatar Upload to Cloudinary
 document.getElementById("avatarInput").addEventListener("change", async function(e){
     const file = e.target.files[0];
     if(!file) return;
+    
+    // Optimistic UI Update (Show loading or immediate preview)
+    const reader = new FileReader();
+    reader.onload = function(ev){ avatarImg.src = ev.target.result; };
+    reader.readAsDataURL(file);
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:"POST", body:formData});
-    const data = await res.json();
-    currentAvatar = data.secure_url;
-    avatarImg.src = currentAvatar;
+    
+    try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:"POST", body:formData});
+        const data = await res.json();
+        currentAvatar = data.secure_url;
+        avatarImg.src = currentAvatar; // Update with final Cloudinary URL
+        
+        // Update LocalStorage instantly so index.html sees it
+        syncLocalStorage();
+        // Also update Firestore immediately for this specific field so it's saved
+        await updateDoc(doc(db, "users", customer.id), { avatar: currentAvatar });
+        
+    } catch(err) {
+        console.error(err);
+        alert("Image upload failed");
+    }
 });
+
+// 🔗 SYNC LOCAL STORAGE (Crucial for index.html header)
+function syncLocalStorage(){
+    const localData = {
+        id: customer.id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        address: customer.address,
+        avatar: currentAvatar
+    };
+    localStorage.setItem("customer", JSON.stringify(localData));
+}
 
 function loadProfileUI(){
     avatarImg.src = currentAvatar;
@@ -231,7 +286,6 @@ function loadProfileUI(){
     document.getElementById("easypaisaInput").value = customer.easypaisa || "";
     document.getElementById("accountHolderInput").value = customer.accountHolder || "";
 
-    // Profile Summary
     const summary = document.getElementById("profileSummary");
     summary.innerHTML = `
         <div><span>Name:</span> ${customer.name || "-"}</div>
@@ -252,29 +306,34 @@ function loadProfileUI(){
     }
 }
 
-// Save profile
+// Save Profile
 async function saveProfile(){
     const name = document.getElementById("nameInput").value.trim();
     const phone = document.getElementById("phoneInput").value.trim();
-    const email = document.getElementById("emailInput").value.trim();
     const country = document.getElementById("countryInput").value.trim();
     const city = document.getElementById("cityInput").value.trim();
     const address = document.getElementById("addressInput").value.trim();
 
-    if(!name || !email){
-        alert("Name and email required");
+    if(!name){
+        alert("Name is required");
         return;
     }
 
     const docRef = doc(db, "users", customer.id);
     await updateDoc(docRef, {
-        name, phone, email, country, city, address, avatar: currentAvatar
+        name, phone, country, city, address, avatar: currentAvatar
     });
-    customer = {...customer, name, phone, email, country, city, address, avatar: currentAvatar};
+    
+    // Update local variable
+    customer = {...customer, name, phone, country, city, address, avatar: currentAvatar};
+    
     loadProfileUI();
+    syncLocalStorage(); // UPDATE LOCAL STORAGE
     closeProfile();
+    alert("Profile updated successfully!");
 }
 
+// Payment Logic
 async function savePayment(){
     const easypaisa = document.getElementById("easypaisaInput").value.trim();
     const accountHolder = document.getElementById("accountHolderInput").value.trim();
@@ -287,21 +346,52 @@ async function savePayment(){
     closePayment();
 }
 
-// Modals
+// Review Logic
+async function saveReview(){
+    const product = document.getElementById("reviewProductInput").value.trim();
+    const text = document.getElementById("reviewTextInput").value.trim();
+    if(!product || !text){ alert("Please fill all fields"); return; }
+    
+    const docRef = doc(db, "users", customer.id);
+    await updateDoc(docRef, {
+        reviews: arrayUnion({ product, text, date: new Date().toLocaleDateString() })
+    });
+    alert("Review submitted! Thank you 💖");
+    closeReview();
+}
+
+// Dummy Loaders
+function loadOrders(){ /* Implementation needed: Firestore 'orders' collection read */ }
+function loadReviews(){ /* Implementation needed: Firestore 'reviews' read */ }
+function loadLiked(){ /* Implementation needed: Firestore 'liked' read */ }
+
+// Modal Controls
 function openProfile(){ document.getElementById("profileModal").style.display="flex"; }
 function closeProfile(){ document.getElementById("profileModal").style.display="none"; }
 function openPayment(){ document.getElementById("paymentModal").style.display="flex"; }
 function closePayment(){ document.getElementById("paymentModal").style.display="none"; }
-
-// Dummy sections for orders/reviews/liked — fetch from Firestore in real implementation
-function loadOrders(){ /* fetch from Firestore orders collection if available */ }
-function loadReviews(){ /* fetch from Firestore reviews collection if available */ }
-function loadLiked(){ /* fetch from Firestore liked items if available */ }
+function openReview(){ document.getElementById("reviewModal").style.display="flex"; }
+function closeReview(){ document.getElementById("reviewModal").style.display="none"; }
 
 // Logout
 function logout(){
-    signOut(auth).then(()=>{ window.location.href="customer-login.html"; });
+    signOut(auth).then(()=>{
+        localStorage.removeItem('customer'); // Clean up
+        window.location.href="customer-login.html";
+    });
 }
+
+// Make functions global for HTML onclick
+window.openProfile = openProfile;
+window.closeProfile = closeProfile;
+window.saveProfile = saveProfile;
+window.openPayment = openPayment;
+window.closePayment = closePayment;
+window.savePayment = savePayment;
+window.openReview = openReview;
+window.closeReview = closeReview;
+window.saveReview = saveReview;
+window.logout = logout;
 
 </script>
 

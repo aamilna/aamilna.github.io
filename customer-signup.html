@@ -17,6 +17,8 @@ background:white;
 padding:50px;
 border-radius:30px;
 box-shadow:0 25px 50px rgba(0,0,0,0.15);
+position: relative; /* Context for z-index */
+z-index: 1;
 }
 
 h1{
@@ -34,16 +36,25 @@ padding:14px;
 border-radius:14px;
 border:1px solid #ccc;
 font-family:'Poppins',sans-serif;
+transition: 0.3s;
+}
+
+input:focus{
+  border-color: #d8a7a0;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(216, 167, 160, 0.2);
 }
 
 button{
 background:#d8a7a0;
+color:white;
 border:none;
 padding:14px;
 border-radius:30px;
 cursor:pointer;
 font-weight:500;
 transition:0.3s;
+font-size: 16px;
 }
 
 button:hover{background:#c8928a;}
@@ -64,10 +75,72 @@ box-shadow:0 10px 30px rgba(0,0,0,0.08);
 .successBox button{
 margin-top:15px;
 }
+
+/* --- MASCOT GUIDE CSS --- */
+#mascotGuide{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  width:220px;
+  background:rgba(255,255,255,0.98);
+  border-radius:24px;
+  box-shadow:0 10px 35px rgba(0,0,0,0.15);
+  z-index:9999;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  transform:translateX(-300px);
+  transition:transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#mascotGuide.show{transform:translateX(0);}
+
+.mascot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+#mascotGuide img{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+  margin-bottom:8px;
+}
+
+.mascot-bubble {
+  background:#fff0f5;
+  border-radius:12px;
+  padding:10px;
+  font-size:12px;
+  color:#4a3b47;
+  text-align:center;
+  border:1px solid rgba(216,167,160,0.3);
+  width:100%;
+  line-height:1.5;
+}
+
+/* Responsive adjustments */
+@media(max-width:768px){
+  .container{margin: 20px auto; padding: 30px;}
+  #mascotGuide{display:none;} /* Hide mascot on mobile to save screen space */
+}
+
 </style>
 </head>
 
 <body>
+
+<!-- MASCOT GUIDE HTML -->
+<div id="mascotGuide">
+  <div class="mascot-content">
+    <img src="mascot.png" alt="Helper">
+    <div class="mascot-bubble" id="mascotBubble">
+      Hello! I'll help you sign up. 📝<br>Click on a field to get started!
+    </div>
+  </div>
+</div>
 
 <div class="container">
 
@@ -119,6 +192,41 @@ const db = getFirestore(app);
 
 const form = document.getElementById("customerSignupForm");
 const successBox = document.getElementById("successBox");
+const mascotBubble = document.getElementById("mascotBubble");
+
+// --- MASCOT LOGIC: Show on Load ---
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('mascotGuide').classList.add('show');
+  }, 1000);
+});
+
+// --- MASCOT LOGIC: Context-Aware Help ---
+const helpTips = {
+  name: "Start with your full name so we know who you are! 💖",
+  email: "Enter a valid email. We'll send order updates there! 📧",
+  password: "Create a strong password (at least 6 characters). 🔒",
+  mobile: "Your phone number helps our artisans contact you if needed. 📱",
+  address: "Where should we deliver your handmade goodies? 🏠",
+  confirmAddress: "Please re-type your address to make sure it's correct! ✅"
+};
+
+// Add focus listeners to all inputs
+form.querySelectorAll('input').forEach(input => {
+  input.addEventListener('focus', () => {
+    const tip = helpTips[input.id];
+    if(tip) {
+      mascotBubble.innerHTML = tip;
+      // Optional: make mascot look at the input if you have different images
+    }
+  });
+  
+  // Optional: Reset when leaving
+  input.addEventListener('blur', () => {
+    mascotBubble.innerHTML = "You're doing great! Keep going. 🌸";
+  });
+});
+
 
 form.addEventListener("submit", async function(e){
 e.preventDefault();
@@ -132,18 +240,24 @@ const confirmAddress = document.getElementById("confirmAddress").value.trim();
 
 if(!name || !email || !password || !mobile || !address || !confirmAddress){
 alert("Please fill in all fields.");
+mascotBubble.innerHTML = "Oops! You missed a spot. 🧐";
 return;
 }
 
 if(!/^\d+$/.test(mobile)){
 alert("Mobile number should contain digits only.");
+mascotBubble.innerHTML = "Phone numbers need digits only! 🔢";
 return;
 }
 
 if(address !== confirmAddress){
 alert("Address and Confirm Address do not match.");
+mascotBubble.innerHTML = "Addresses don't match. Please check! 🧐";
 return;
 }
+
+// Update mascot while loading
+mascotBubble.innerHTML = "Creating your account... ⏳";
 
 try {
 
@@ -169,25 +283,44 @@ try {
     }
   });
 
+  // 🔗 SYNC WITH LOCALSTORAGE
+  const customerData = {
+      id: user.uid,
+      name: name,
+      email: email,
+      phone: mobile,
+      address: address,
+      avatar: "https://via.placeholder.com/150"
+  };
+  localStorage.setItem("customer", JSON.stringify(customerData));
+
+  // Success State
   form.style.display = "none";
   successBox.style.display = "block";
+  
+  // Mascot Success Message
+  mascotBubble.innerHTML = "Yay! You're all set! 🎉<br>Welcome to AaMilNa!";
 
 } catch(error) {
 
   if(error.code === "auth/email-already-in-use"){
     alert("Email already registered. Please login.");
+    mascotBubble.innerHTML = "This email is already taken. Try logging in! 🤔";
   } else if(error.code === "auth/weak-password"){
     alert("Password should be at least 6 characters.");
+    mascotBubble.innerHTML = "Password too short! Make it 6+ chars. 💪";
   } else {
+    console.error(error);
     alert("Something went wrong. Please try again.");
+    mascotBubble.innerHTML = "Oh no, something broke. Try again? 😟";
   }
 
 }
 
 });
 
-function goToDashboard(){
-window.location.href = "customer-dashboard.html";
+window.goToDashboard = function(){
+  window.location.href = "customer-dashboard.html";
 }
 
 </script>

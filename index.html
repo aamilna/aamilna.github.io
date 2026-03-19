@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>AaMilNa</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -17,372 +17,140 @@ body{
 }
 
 /* 🌸 FLORAL BACKGROUND */
-.bubble-bg{
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  overflow:hidden;
-}
-.bubble{
-  position:absolute;
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  background:radial-gradient(circle at top left,
-  rgba(255,255,255,0.9),
-  rgba(255,220,230,0.45),
-  rgba(200,150,170,0.25));
-  backdrop-filter: blur(6px);
-  animation: float 30s infinite ease-in-out;
-}
-.bubble::after{
-  content:"🌸";
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:70px;
-  opacity:0.35;
-}
+.bubble-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.bubble{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at top left,rgba(255,255,255,0.9),rgba(255,220,230,0.45),rgba(200,150,170,0.25));backdrop-filter: blur(6px);animation: float 30s infinite ease-in-out;}
+.bubble::after{content:"🌸";position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:70px;opacity:0.35;}
 .bubble:nth-child(1){top:8%;left:6%;}
 .bubble:nth-child(2){top:55%;left:70%;animation-duration:36s;}
 .bubble:nth-child(3){top:28%;left:40%;animation-duration:42s;}
-
-@keyframes float{
-  0%{transform:translateY(0);}
-  50%{transform:translateY(-60px);}
-  100%{transform:translateY(0);}
-}
+@keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-60px);}100%{transform:translateY(0);}}
 
 /* HEADER */
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:22px 50px;
-  background:rgba(255,255,255,0.85);
-  box-shadow:0 8px 25px rgba(0,0,0,0.08);
-  position:relative;
-}
-header img{
-  height:95px;
-  cursor:pointer;
-}
+header{display:flex;justify-content:space-between;align-items:center;padding:22px 50px;background:rgba(255,255,255,0.95);box-shadow:0 8px 25px rgba(0,0,0,0.08);position:sticky;top:0;z-index:1000;}
+header img{height:95px;cursor:pointer;}
+
+/* SEARCH BAR */
+.search-box{flex:1;max-width:450px;margin:0 30px;position:relative;}
+.search-box input{width:100%;padding:12px 50px 12px 24px;border-radius:30px;border:2px solid rgba(216,167,160,0.3);background:rgba(255,255,255,0.9);font-family:'Poppins',sans-serif;font-size:14px;color:#4a3b47;outline:none;transition:0.3s;}
+.search-box input::placeholder{color:#bfa8a0;}
+.search-box input:focus{border-color:#d8a7a0; box-shadow:0 4px 15px rgba(216,167,160,0.2);}
+.search-box button{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:none;border-radius:50%;background:#d8a7a0;color:white;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:0.3s;}
+.search-box button:hover{background:#c8928a;}
 
 /* NAV */
-.nav{
-  display:flex;
-  gap:25px;
-  align-items:center;
-}
-.nav a{
-  text-decoration:none;
-  font-size:14px;
-  font-weight:500;
-  color:#4a3b47;
-  padding:10px 22px;
-  border-radius:30px;
-  background:#d8a7a0;
-  transition:0.3s;
-}
-.nav a:hover{
-  background:#c8928a;
-}
+.nav{display:flex;gap:25px;align-items:center;}
+.nav a{text-decoration:none;font-size:14px;font-weight:500;color:#4a3b47;padding:10px 22px;border-radius:30px;background:#d8a7a0;transition:0.3s;position:relative;z-index:1001;}
+.nav a:hover{background:#c8928a;}
+.nav a.pulse-guide{animation:pulseBtn 1.5s infinite;box-shadow:0 0 0 0 rgba(216,167,160,0.7);}
+@keyframes pulseBtn{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(216,167,160,0.7);}70%{transform:scale(1.1);box-shadow:0 0 0 10px rgba(216,167,160,0);}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(216,167,160,0);}}
 
 /* PROFILE */
-.profile-container{
-  cursor:pointer;
-  position:relative;
-}
-.profile-avatar{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  object-fit:cover;
-  border:2px solid #d8a7a0;
-}
-.profile-dropdown{
-  position:absolute;
-  right:0;
-  top:60px;
-  background:white;
-  border-radius:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
-  padding:20px;
-  width:250px;
-  display:none;
-  flex-direction:column;
-  z-index:100;
-}
-.profile-dropdown h4{
-  margin-bottom:6px;
-  font-size:16px;
-}
-.profile-dropdown p{
-  margin-bottom:6px;
-  font-size:14px;
-  color:#555;
-}
-.profile-dropdown button{
-  margin-top:10px;
-  background:#d8a7a0;
-  border:none;
-  padding:10px;
-  border-radius:20px;
-  cursor:pointer;
-  width:100%;
-  font-weight:500;
-}
-.profile-dropdown button:hover{
-  background:#c8928a;
-}
-.profile-dropdown input[type="file"]{
-  margin-top:10px;
-}
+.profile-container{cursor:pointer;position:relative;}
+.profile-avatar{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #d8a7a0;}
+.profile-dropdown{position:absolute;right:0;top:60px;background:white;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.15);padding:20px;width:250px;display:none;flex-direction:column;z-index:100;}
+.profile-dropdown h4{margin-bottom:6px;font-size:16px;}
+.profile-dropdown p{margin-bottom:6px;font-size:14px;color:#555;}
+.profile-dropdown button{margin-top:10px;background:#d8a7a0;border:none;padding:10px;border-radius:20px;cursor:pointer;width:100%;font-weight:500;}
+.profile-dropdown button:hover{background:#c8928a;}
 
 /* HERO */
-.hero{
-  text-align:center;
-  padding:120px 20px;
-}
-.hero h1{
-  font-family:'Playfair Display',serif;
-  font-size:66px;
-  font-style:italic;
-  margin-bottom:18px;
-}
-.hero p{
-  max-width:650px;
-  margin:auto;
-  font-size:18px;
-  opacity:0.85;
-}
+.hero{text-align:center;padding:120px 20px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:66px;font-style:italic;margin-bottom:18px;}
+.hero p{max-width:650px;margin:auto;font-size:18px;opacity:0.85;}
 
 /* STORY SECTION */
-.story-section{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:60px;
-  margin:100px 60px;
-  padding:60px;
-  background:linear-gradient(135deg,
-  rgba(255,230,240,0.25),
-  rgba(255,255,255,0.8));
-  border-radius:32px;
-  box-shadow:0 25px 50px rgba(0,0,0,0.08);
-  position:relative;
-}
-.story-image{
-  flex:1;
-  min-width:320px;
-  position:relative;
-}
-.story-image img{
-  width:100%;
-  border-radius:32px;
-  object-fit:cover;
-  box-shadow:0 15px 35px rgba(0,0,0,0.12);
-}
-.story-text{
-  flex:1;
-  min-width:320px;
-}
-.story-text h2{
-  font-family:'Playfair Display',serif;
-  font-size:40px;
-  margin-bottom:25px;
-}
-.story-text p{
-  font-size:16.5px;
-  line-height:1.9;
-  margin-bottom:18px;
-  opacity:0.92;
-}
-.story-buttons{
-  margin-top:25px;
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-}
-.story-buttons a{
-  display:inline-block;
-  background:#d8a7a0;
-  color:#4a3b47;
-  text-decoration:none;
-  padding:13px 30px;
-  border-radius:40px;
-  font-weight:500;
-  transition:0.3s;
-  box-shadow:0 8px 18px rgba(0,0,0,0.08);
-}
-.story-buttons a:hover{
-  background:#c8928a;
-  transform:translateY(-3px);
-}
-
-/* Floating story bubbles */
-.story-bubble{
-  position:absolute;
-  font-size:35px;
-  opacity:0.25;
-  animation: floatStory 28s infinite ease-in-out;
-}
+.story-section{display:flex;flex-wrap:wrap;align-items:center;gap:60px;margin:100px 60px;padding:60px;background:linear-gradient(135deg, rgba(255,230,240,0.25), rgba(255,255,255,0.8));border-radius:32px;box-shadow:0 25px 50px rgba(0,0,0,0.08);position:relative;}
+.story-image{flex:1;min-width:320px;position:relative;}
+.story-image img{width:100%;border-radius:32px;object-fit:cover;box-shadow:0 15px 35px rgba(0,0,0,0.12);}
+.story-text{flex:1;min-width:320px;}
+.story-text h2{font-family:'Playfair Display',serif;font-size:40px;margin-bottom:25px;}
+.story-text p{font-size:16.5px;line-height:1.9;margin-bottom:18px;opacity:0.92;}
+.story-buttons{margin-top:25px;display:flex;gap:20px;flex-wrap:wrap;}
+.story-buttons a{display:inline-block;background:#d8a7a0;color:#4a3b47;text-decoration:none;padding:13px 30px;border-radius:40px;font-weight:500;transition:0.3s;box-shadow:0 8px 18px rgba(0,0,0,0.08);}
+.story-buttons a:hover{background:#c8928a;transform:translateY(-3px);}
+.story-bubble{position:absolute;font-size:35px;opacity:0.25;animation:floatStory 28s infinite ease-in-out;}
 .story-bubble:nth-child(1){animation-duration:30s;}
 .story-bubble:nth-child(2){animation-duration:36s;}
 .story-bubble:nth-child(3){animation-duration:42s;}
-
-@keyframes floatStory{
-  0%{transform:translateY(0);}
-  50%{transform:translateY(-40px);}
-  100%{transform:translateY(0);}
-}
+@keyframes floatStory{0%{transform:translateY(0);}50%{transform:translateY(-40px);}100%{transform:translateY(0);}}
 
 /* SECTION */
-section{
-  padding:80px 50px;
-}
-.section-title{
-  text-align:center;
-  font-family:'Playfair Display',serif;
-  font-size:40px;
-  margin-bottom:50px;
-}
+section{padding:80px 50px;}
+.section-title{text-align:center;font-family:'Playfair Display',serif;font-size:40px;margin-bottom:50px;}
 
 /* COLLECTION */
-.collection{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:35px;
-}
-.card{
-  background:rgba(255,255,255,0.95);
-  border-radius:28px;
-  padding:25px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.12);
-  text-align:center;
-  transition:0.4s;
-  cursor:pointer;
-}
-.card:hover{
-  transform:translateY(-10px) scale(1.03);
-}
-.card img{
-  width:100%;
-  height:230px;
-  object-fit:cover;
-  border-radius:20px;
-  margin-bottom:18px;
-}
-.card h3{
-  margin-bottom:15px;
-}
-.card a{
-  display:inline-block;
-  background:#d8a7a0;
-  color:#4a3b47;
-  text-decoration:none;
-  padding:12px 30px;
-  border-radius:30px;
-  font-weight:500;
-  transition:0.3s;
-}
-.card a:hover{
-  background:#c8928a;
-}
+.collection{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:35px;}
+.card{background:rgba(255,255,255,0.95);border-radius:28px;padding:25px;box-shadow:0 20px 40px rgba(0,0,0,0.12);text-align:center;transition:0.4s;cursor:pointer;}
+.card:hover{transform:translateY(-10px) scale(1.03);}
+.card img{width:100%;height:230px;object-fit:cover;border-radius:20px;margin-bottom:18px;}
+.card h3{margin-bottom:15px;}
+.card a{display:inline-block;background:#d8a7a0;color:#4a3b47;text-decoration:none;padding:12px 30px;border-radius:30px;font-weight:500;transition:0.3s;}
+.card a:hover{background:#c8928a;}
 
 /* FOOTER */
-footer{
-  background:#eadfd4;
-  padding:30px 20px;
-  font-size:14px;
-}
-.footer-row{
+footer{background:#eadfd4;padding:30px 20px;font-size:14px;}
+.footer-row{display:flex;justify-content:center;align-items:center;gap:50px;flex-wrap:wrap;}
+footer a.contact-link{display:flex;align-items:center;gap:8px;text-decoration:none;color:#4a3b47;font-weight:500;}
+footer a.contact-link img{width:22px;height:22px;}
+.footer-bottom{text-align:center;margin-top:20px;}
+
+/* VIEWPORT SIZE INDICATOR */
+#viewportSize{position:fixed;bottom:20px;right:20px;background:rgba(216,167,160,0.85);color:#4a3b47;padding:10px 16px;border-radius:20px;font-weight:500;font-size:14px;box-shadow:0 5px 18px rgba(0,0,0,0.15);z-index:9999;pointer-events:none;}
+
+/* --- GAMES CORNER BUTTON --- */
+.games-corner-btn{
+  position:fixed;
+  bottom:80px; /* Sits above the viewport indicator */
+  right:20px;
+  width:60px;
+  height:60px;
+  background:#d8a7a0;
+  border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:50px;
-  flex-wrap:wrap;
-}
-footer a.contact-link{
-  display:flex;
-  align-items:center;
-  gap:8px;
+  box-shadow:0 8px 20px rgba(216,167,160,0.5);
+  z-index:9998;
+  cursor:pointer;
+  transition:0.3s;
   text-decoration:none;
-  color:#4a3b47;
-  font-weight:500;
+  font-size:28px;
+  border: 2px solid rgba(255,255,255,0.5);
 }
-footer a.contact-link img{
-  width:22px;
-  height:22px;
-}
-.footer-bottom{
-  text-align:center;
-  margin-top:20px;
+.games-corner-btn:hover{
+  transform:scale(1.1) rotate(-10deg);
+  background:#c8928a;
+  box-shadow:0 12px 25px rgba(216,167,160,0.6);
 }
 
-/* VIEWPORT SIZE INDICATOR */
-#viewportSize{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:rgba(216,167,160,0.85);
-  color:#4a3b47;
-  padding:10px 16px;
-  border-radius:20px;
-  font-weight:500;
-  font-size:14px;
-  box-shadow:0 5px 18px rgba(0,0,0,0.15);
-  z-index:9999;
-  pointer-events:none;
-}
+/* --- MASCOT GUIDE SYSTEM --- */
+#mascotGuide{position:fixed;left:20px;bottom:80px;display:flex;flex-direction:column;align-items:center;z-index:9999;transition:all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);transform:translateX(-150%);opacity:0;}
+#mascotGuide.show{transform:translateX(0);opacity:1;}
+.mascot-box{background:rgba(255,255,255,0.98);padding:12px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,0.15);display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;border:2px solid rgba(216,167,160,0.3);max-width:160px;}
+.mascot-box img{width:70px;height:70px;object-fit:contain;transition:transform 0.3s;cursor:pointer;}
+.mascot-box img:hover{transform:scale(1.1);}
+.mascot-bubble{background:#fff0f5;border-radius:10px;padding:6px 10px;font-size:11px;color:#4a3b47;text-align:center;line-height:1.4;width:100%;border:1px solid #ffd6e0;}
+.click-hint{position:absolute;top:-5px;right:-5px;background:#ff6b6b;color:white;width:20px;height:20px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;animation:hintPulse 1.5s infinite;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+@keyframes hintPulse{0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);}}
+.mascot-choices{margin-top:5px;width:100%;display:none;flex-direction:column;gap:6px;}
+.mascot-choices.show{display:flex;}
+.mascot-btn{background:white;border:1.5px solid #d8a7a0;color:#4a3b47;padding:6px;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:500;cursor:pointer;transition:0.3s;font-size:11px;}
+.mascot-btn:hover{background:#d8a7a0;color:white;}
 
-/* --- MASCOT GUIDE --- */
-#mascotGuide{
-  position:fixed;
-  bottom:0;
-  left:-250px;
-  width:220px;
-  background:rgba(255,240,245,0.95);
-  border-radius:32px 0 0 32px;
-  box-shadow:0 10px 35px rgba(0,0,0,0.18);
-  z-index:999;
-  padding:15px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  transition:0.7s;
-}
-#mascotGuide img{
-  width:120px;
-  animation: waveHand 2s infinite alternate;
-}
-#mascotGuide p{
-  text-align:center;
-  font-size:14px;
-  margin-top:10px;
-  color:#4a3b47;
-}
-#mascotGuide.show{left:0;}
-
-@keyframes waveHand{
-  0%{transform:rotate(0deg);}
-  50%{transform:rotate(15deg);}
-  100%{transform:rotate(-15deg);}
-}
+/* GUIDE ARROW SVG */
+#guideArrowSvg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;opacity:0;transition:opacity 0.5s;}
+#guideArrowSvg.show{opacity:1;}
+.guide-path{fill:none;stroke:#d8a7a0;stroke-width:3;stroke-dasharray:8, 6;stroke-linecap:round;}
 
 /* RESPONSIVE */
 @media(max-width:900px){
-  .story-section{
-    flex-direction:column;
-    gap:40px;
-    margin:60px 20px;
-    padding:40px;
-  }
-  #mascotGuide{
-    width:180px;
-  }
+  .story-section{flex-direction:column;gap:40px;margin:60px 20px;padding:40px;}
+  #mascotGuide{width:auto;bottom:100px;}
+  .mascot-box{max-width:130px;}
+  .mascot-box img{width:50px;height:50px;}
+  header{flex-wrap:wrap;padding:15px 20px;}
+  .search-box{order:3;width:100%;max-width:100%;margin:15px 0 0 0;}
+  .games-corner-btn{width:50px;height:50px;font-size:24px;bottom:70px;}
 }
 </style>
 </head>
@@ -395,8 +163,19 @@ footer a.contact-link img{
   <div class="bubble"></div>
 </div>
 
+<svg id="guideArrowSvg" xmlns="http://www.w3.org/2000/svg">
+  <path id="arrowPath" class="guide-path" d="" />
+  <polygon id="arrowHead" fill="#d8a7a0" points="0,0 0,0 0,0" />
+</svg>
+
 <header>
   <img src="logo.png" alt="AaMilNa Logo" onclick="location.href='index.html'">
+  
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search collections...">
+    <button id="searchBtn">🔍</button>
+  </div>
+
   <div style="display:flex; align-items:center; gap:25px;">
     <div class="nav" id="navLinks"></div>
     <div class="profile-container" id="profileContainer"></div>
@@ -408,23 +187,17 @@ footer a.contact-link img{
   <p>Where artisans are kings and queens — a gentle platform to showcase handmade stories.</p>
 </div>
 
-<!-- STORY / ABOUT SECTION -->
 <div class="story-section">
   <div class="story-image">
     <img src="illustration.png" alt="Coding & Artisan Illustration">
-
     <div class="story-bubble" style="top:10%; left:15%;">🌸</div>
     <div class="story-bubble" style="top:50%; left:70%;">🌸</div>
     <div class="story-bubble" style="top:30%; left:40%;">🌸</div>
   </div>
-
   <div class="story-text">
     <h2>Our Story & Journey</h2>
-
     <p><strong>The Vision:</strong> AaMilNa is more than a platform — it’s a gentle space where artisans’ creativity shines. Every handmade piece tells a story, and we’re here to celebrate those stories while empowering small creators.</p>
-
     <p><strong>Our Journey:</strong> The spirit of entrepreneurship in me took me on a challenging voyage. As a high school student preparing for my last board exams, I’ve faced storms — balancing studies, coding, designing, developing, and building this mission alone. The journey hasn’t been easy, and I’m still tackling these challenges. But with support, guidance, and encouragement, the burden feels lighter. Every struggle is a step forward, and I hope my journey inspires others to pursue their dreams, no matter the obstacles.</p>
-
     <div class="story-buttons">
       <a href="#collectionContainer">Discover Our Mission</a>
       <a href="shop.html">Meet the Artisans</a>
@@ -443,42 +216,96 @@ footer a.contact-link img{
       <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png">
       aamila.com@gmail.com
     </a>
-
     <a href="https://www.instagram.com/aamilna_offical" target="_blank" class="contact-link">
       <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png">
       @aamilna_offical
     </a>
   </div>
-
   <div class="footer-bottom">
     © 2026 AaMilNa • Softly handmade 🤍
   </div>
 </footer>
 
-<!-- VIEWPORT SIZE INDICATOR -->
+<!-- FLOATING GAMES BUTTON -->
+<a href="game.html" class="games-corner-btn" title="Play Games">🎮</a>
+
 <div id="viewportSize"></div>
 
-<!-- --- MASCOT GUIDE --- -->
 <div id="mascotGuide">
-  <img src="mascot.png" alt="AaMilNa Mascot">
-  <p>Hi there! 👋 Welcome to AaMilNa! I’ll guide you through our handmade collections and artisan stories. 💖</p>
+  <div class="mascot-box">
+    <div style="position:relative;">
+        <img src="mascot.png" alt="Mascot" id="mascotImg">
+        <div class="click-hint" id="clickHint">1</div>
+    </div>
+    <div class="mascot-bubble" id="mascotBubble">
+      Hi! 👋 Click me to get started!
+    </div>
+    
+    <div class="mascot-choices" id="mascotChoices">
+      <div style="font-size:10px; opacity:0.8;">I am a...</div>
+      <button class="mascot-btn" onclick="guideUser('customer')">Customer</button>
+      <button class="mascot-btn" onclick="guideUser('artisan')">Artisan</button>
+    </div>
+  </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// --- FIREBASE CONFIG ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCHMIBHlYGqyw4U7ZZplwi4LgQxga99nLM",
+  authDomain: "aamilna.firebaseapp.com",
+  projectId: "aamilna",
+  storageBucket: "aamilna.firebasestorage.app",
+  messagingSenderId: "127180284017",
+  appId: "1:127180284017:web:b024e50670228b085f7bd0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// --- GLOBAL STATE ---
 let customer = JSON.parse(localStorage.getItem("customer"));
 let artisan = JSON.parse(localStorage.getItem("artisanProfile"));
 const showAdminButton = true;
 const adminPassword = "AaMilNaSecret123";
 
 const nav = document.getElementById("navLinks");
+const profileContainer = document.getElementById("profileContainer");
+const mascot = document.getElementById('mascotGuide');
 
+// --- 1. RENDER STATIC CONTENT IMMEDIATELY ---
+const collections=[
+  {name:'Embroidered Tote Bags',img:'tote.jpg'}, {name:'Crochet Collection',img:'crochet.jpg'}, {name:'Handmade Jewelry',img:'jewelry.jpg'},
+  {name:'Artisan Stationery',img:'stationery.jpg'}, {name:'Textile Arts',img:'textile.jpg'}, {name:'Art & Illustration',img:'art.jpg'},
+  {name:'Home & Decor',img:'decor.jpg'}, {name:'Edible Art',img:'edible.jpg'}, {name:'Self-Care & Wellness',img:'selfcare.jpg'},
+  {name:'Custom & Personalized',img:'custom.jpg'}
+];
+const collectionContainer=document.getElementById('collectionContainer');
+
+function renderCollections(data) {
+  collectionContainer.innerHTML = '';
+  if(data.length === 0){ collectionContainer.innerHTML = '<p style="text-align:center; width:100%; color:#888; grid-column: 1 / -1;">No collections found.</p>'; return; }
+  data.forEach(col=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`<img src="${col.img}" alt="${col.name}"><h3>${col.name}</h3><a href="shop.html">Discover</a>`;
+    collectionContainer.appendChild(card);
+  });
+}
+renderCollections(collections); 
+
+// --- 2. UI FUNCTIONS ---
 function setNavLinks() {
   let links = '';
   if(artisan && artisan.id) links += `<a href="artisan-dashboard.html">Dashboard</a>`;
   else if(customer && customer.id) links += `<a href="customer-dashboard.html">Dashboard</a>`;
   else {
-    links += `<a href="customer-login.html">Customer</a>
-              <a href="artisan-signup.html">Artisan</a>`;
+    links += `<a href="customer-login.html" id="nav-customer">Customer</a>
+              <a href="artisan-signup.html" id="nav-artisan">Artisan</a>`;
     if(showAdminButton) links += `<a href="#" id="adminBtn">Admin</a>`;
   }
   nav.innerHTML = links;
@@ -487,17 +314,13 @@ function setNavLinks() {
   if(adminLink){
     adminLink.addEventListener('click', ()=> {
       const pwd = prompt("Enter Admin Password:");
-      if(pwd === adminPassword){
-        alert("Welcome Admin!");
-        window.location.href = "admin-dashboard.html";
-      } else alert("Incorrect password!");
+      if(pwd === adminPassword){ alert("Welcome Admin!"); window.location.href = "admin-dashboard.html"; } 
+      else alert("Incorrect password!");
     });
   }
 }
 
-const profileContainer = document.getElementById("profileContainer");
-
-function setProfile(user,type){
+function setProfile(user, type){
   if(!user) return;
   profileContainer.innerHTML = `
     <img src="${user.avatar || 'https://via.placeholder.com/150'}" class="profile-avatar" id="profileAvatar">
@@ -506,111 +329,142 @@ function setProfile(user,type){
       <p><strong>Email:</strong> ${user.email}</p>
       ${user.phone ? `<p><strong>Phone:</strong> ${user.phone}</p>`:''}
       ${user.address ? `<p><strong>Address:</strong> ${user.address}</p>`:''}
-      ${type==='customer'?'<input type="file" id="avatarUpload" accept="image/*">':''}
       <button id="logoutBtn">Logout</button>
     </div>
   `;
 
   const avatarImg=document.getElementById('profileAvatar');
   const dropdown=document.getElementById('profileDropdown');
-
-  avatarImg.addEventListener('click',e=>{
-    e.stopPropagation();
-    dropdown.style.display=dropdown.style.display==='flex'?'none':'flex';
-  });
-
-  document.getElementById('logoutBtn').addEventListener('click',()=>{
-    if(type==='customer') localStorage.removeItem('customer');
-    else localStorage.removeItem('artisanProfile');
+  
+  avatarImg.addEventListener('click', e => { e.stopPropagation(); dropdown.style.display=dropdown.style.display==='flex'?'none':'flex'; });
+  
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth);
+    localStorage.removeItem('customer');
+    localStorage.removeItem('artisanProfile');
     location.reload();
   });
 
-  if(type==='customer'){
-    document.getElementById('avatarUpload').addEventListener('change',e=>{
-      const file=e.target.files[0];
-      if(file){
-        const reader=new FileReader();
-        reader.onload=function(ev){
-          avatarImg.src=ev.target.result;
-          user.avatar=ev.target.result;
-          localStorage.setItem('customer',JSON.stringify(user));
-        }
-        reader.readAsDataURL(file);
-      }
-    });
-  }
-
-  document.addEventListener('click',e=>{
-    if(!profileContainer.contains(e.target)) dropdown.style.display='none';
-  });
+  document.addEventListener('click', e => { if(!profileContainer.contains(e.target)) dropdown.style.display='none'; });
 }
 
-const collections=[
-  {name:'Embroidered Tote Bags',img:'tote.jpg'},
-  {name:'Crochet Collection',img:'crochet.jpg'},
-  {name:'Handmade Jewelry',img:'jewelry.jpg'},
-  {name:'Artisan Stationery',img:'stationery.jpg'},
-  {name:'Textile Arts',img:'textile.jpg'},
-  {name:'Art & Illustration',img:'art.jpg'},
-  {name:'Home & Decor',img:'decor.jpg'},
-  {name:'Edible Art',img:'edible.jpg'},
-  {name:'Self-Care & Wellness',img:'selfcare.jpg'},
-  {name:'Custom & Personalized',img:'custom.jpg'}
-];
-
-const collectionContainer=document.getElementById('collectionContainer');
-collections.forEach(col=>{
-  const card=document.createElement('div');
-  card.className='card';
-  card.innerHTML=`
-    <img src="${col.img}" alt="${col.name}">
-    <h3>${col.name}</h3>
-    <a href="shop.html">Discover</a>
-  `;
-  collectionContainer.appendChild(card);
-});
-
-// --- VIEWPORT SIZE INDICATOR ---
-const viewportIndicator=document.getElementById('viewportSize');
-function updateViewportSize(){
-  viewportIndicator.textContent=`${window.innerWidth}px × ${window.innerHeight}px`;
-}
-window.addEventListener('resize', updateViewportSize);
-updateViewportSize();
-
-// --- INIT ---
+// Initial Fast Render based on LocalStorage
 setNavLinks();
-if(customer && customer.id) setProfile(customer,'customer');
-if(artisan && artisan.id) setProfile(artisan,'artisan');
+if(customer) setProfile(customer, 'customer');
+if(artisan) setProfile(artisan, 'artisan');
 
-// --- MASCOT SLIDE-IN ---
-const mascot=document.getElementById('mascotGuide');
-window.addEventListener('load',()=>{
-  setTimeout(()=>{mascot.classList.add('show');},1500);
+// Show Mascot only if NO user is found
+if(!customer && !artisan){
+    setTimeout(()=>{ mascot.classList.add('show'); }, 1500);
+}
+
+// --- 3. AUTH LISTENER (The Permanent Connection) ---
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // User is signed in.
+    const uid = user.uid;
+    
+    // SAFETY NET: If localStorage is empty but Firebase session exists, fetch data
+    if(!customer && !artisan) {
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists()){
+            const data = docSnap.data();
+            if(data.role === 'artisan') {
+                artisan = { id: uid, ...data };
+                localStorage.setItem('artisanProfile', JSON.stringify(artisan));
+                setProfile(artisan, 'artisan');
+            } else {
+                customer = { id: uid, ...data };
+                localStorage.setItem('customer', JSON.stringify(customer));
+                setProfile(customer, 'customer');
+            }
+            setNavLinks(); // Update buttons
+        }
+    }
+    
+    // Hide mascot if logged in
+    document.getElementById('mascotGuide').classList.remove('show');
+    
+  } else {
+    // User is signed out.
+    if(customer || artisan) {
+        localStorage.removeItem('customer');
+        localStorage.removeItem('artisanProfile');
+        location.reload(); 
+    }
+  }
 });
-</script>
 
+// --- 4. SEARCH LOGIC ---
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase();
+  renderCollections(collections.filter(c => c.name.toLowerCase().includes(term)));
+});
+
+// --- 5. MASCOT LOGIC ---
+const mascotImg = document.getElementById('mascotImg');
+const mascotBubble = document.getElementById('mascotBubble');
+const mascotChoices = document.getElementById('mascotChoices');
+const clickHint = document.getElementById('clickHint');
+const arrowSvg = document.getElementById('guideArrowSvg');
+const arrowPath = document.getElementById('arrowPath');
+const arrowHead = document.getElementById('arrowHead');
+
+mascotImg.addEventListener('click', () => {
+  if(mascotChoices.classList.contains('show')) return; 
+  clickHint.style.display = 'none';
+  mascotBubble.innerHTML = "Welcome! 🌸<br>Who are you?";
+  mascotChoices.classList.add('show');
+});
+
+window.guideUser = function(type) {
+  const targetId = type === 'customer' ? 'nav-customer' : 'nav-artisan';
+  const targetBtn = document.getElementById(targetId);
+  
+  if(targetBtn){
+    mascotBubble.innerHTML = "Follow me! 🏃‍♀️";
+    mascotChoices.style.display = 'none'; 
+
+    const targetRect = targetBtn.getBoundingClientRect();
+    const targetX = targetRect.left - 120; 
+    const targetY = targetRect.top; 
+    
+    mascot.style.bottom = 'auto'; 
+    mascot.style.top = targetY + 'px';
+    mascot.style.left = targetX + 'px';
+
+    setTimeout(() => {
+        mascotBubble.innerHTML = `Click the <strong>${type}</strong> button here! 👇`;
+        
+        const mascotWidth = 160;
+        const startX = targetX + mascotWidth;
+        const startY = targetY + 50; 
+        
+        const endX = targetRect.left + (targetRect.width/2);
+        const endY = targetRect.top + (targetRect.height/2);
+        
+        arrowPath.setAttribute('d', `M ${startX} ${startY} L ${endX} ${endY}`);
+        
+        const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+        arrowHead.setAttribute('points', `${endX},${endY} ${endX-10},${endY-5} ${endX-10},${endY+5}`);
+        arrowHead.setAttribute('transform', `translate(${endX}, ${endY}) rotate(${angle}) translate(${-endX}, ${-endY})`);
+
+        arrowSvg.classList.add('show');
+        targetBtn.classList.add('pulse-guide');
+    }, 1200); 
+  }
+}
+
+// Viewport
+const viewportIndicator=document.getElementById('viewportSize');
+function updateViewportSize(){ viewportIndicator.textContent=`${window.innerWidth}px × ${window.innerHeight}px`; }
+window.addEventListener('resize', updateViewportSize); updateViewportSize();
+
+</script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

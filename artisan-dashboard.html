@@ -7,31 +7,23 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Poppins',sans-serif;background:#fff7f0;color:#4a3b47;overflow-x:hidden;}
-/* Background Bubbles */
 .bubble-bg{position:fixed;inset:0;z-index:-1;}
 .bubble{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at top left,rgba(255,255,255,.9),rgba(255,220,230,.45),rgba(200,150,170,.25));animation:float 30s infinite ease-in-out;}
 .bubble::after{content:"🌸";display:flex;align-items:center;justify-content:center;height:100%;font-size:70px;opacity:.35;}
-.bubble:nth-child(1){top:8%;left:6%;}
-.bubble:nth-child(2){top:55%;left:70%;}
-.bubble:nth-child(3){top:30%;left:40%;}
+.bubble:nth-child(1){top:8%;left:6%;} .bubble:nth-child(2){top:55%;left:70%;} .bubble:nth-child(3){top:30%;left:40%;}
 @keyframes float{50%{transform:translateY(-60px);}}
-
-/* Header */
 header{display:flex;justify-content:space-between;align-items:center;padding:22px 50px;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);}
-header img{height:90px;}
-header button{background:#d8a7a0;border:none;padding:10px 22px;border-radius:30px;cursor:pointer;font-weight:500;transition:.3s;}
-header button:hover{opacity:.85;}
+header img{height:90px;} 
+.header-btns{display:flex; gap:15px;}
+header button{background:#d8a7a0;border:none;padding:10px 22px;border-radius:30px;cursor:pointer;font-weight:500;transition:.3s; font-family: 'Poppins', sans-serif;}
+header button:hover{opacity:.85; transform: translateY(-2px);}
 
-/* Dashboard */
 .dashboard{max-width:1300px;margin:120px auto 80px;padding:0 30px;}
 h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-bottom:30px;}
-
-/* Profile Box */
 .profileBox{display:flex;gap:25px;align-items:center;background:white;padding:25px;border-radius:25px;box-shadow:0 15px 35px rgba(0,0,0,.08);}
-.avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid #d8a7a0;}
-.editProfile{margin-top:10px;background:#d8a7a0;border:none;padding:8px 18px;border-radius:20px;font-size:13px;cursor:pointer;}
-
-/* Products scroll */
+.avatar{width:75px;height:75px;border-radius:50%;object-fit:cover;border:4px solid #d8a7a0;}
+.editProfile{margin-top:10px;background:#d8a7a0;border:none;padding:8px 18px;border-radius:20px;font-size:13px;cursor:pointer; transition: 0.2s;}
+.editProfile:active{transform: scale(0.95);}
 .products{display:flex;gap:25px;margin-top:25px;overflow-x:scroll;overflow-y:hidden;padding-bottom:10px;scrollbar-width:thin;scrollbar-color:#d8a7a0 rgba(0,0,0,0.05);}
 .products::-webkit-scrollbar{height:10px;}
 .products::-webkit-scrollbar-thumb{background:#d8a7a0;border-radius:10px;}
@@ -45,12 +37,11 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 .product-status{font-size:12px;color:#b96a6a;margin-bottom:6px;}
 .product-likes{font-size:12px;color:#4a3b47;margin-bottom:6px;}
 .controls{display:flex;gap:8px;margin-top:10px;}
-.controls button{flex:1;padding:7px;border-radius:14px;border:none;cursor:pointer;font-size:13px;}
-.edit{background:#d8a7a0;}
-.delete{background:#b96a6a;color:white;}
-.addBtn{margin-top:20px;background:#d8a7a0;border:none;padding:10px 20px;border-radius:22px;cursor:pointer;}
-
-/* Orders Table */
+.controls button{flex:1;padding:7px;border-radius:14px;border:none;cursor:pointer;font-size:13px; transition: 0.2s;}
+.controls button:active{transform: scale(0.95);}
+.edit{background:#d8a7a0;} .delete{background:#b96a6a;color:white;}
+.addBtn{margin-top:20px;background:#d8a7a0;border:none;padding:10px 20px;border-radius:22px;cursor:pointer; transition: 0.2s;}
+.addBtn:active{transform: scale(0.95);}
 .orders{margin-top:50px;background:white;padding:25px;border-radius:25px;box-shadow:0 15px 35px rgba(0,0,0,.08);overflow-x:auto;}
 .orders h3{margin-bottom:20px;}
 .orders table{width:100%;border-collapse:collapse;min-width:900px;}
@@ -59,59 +50,132 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 .orders tr:hover{background:#fdf0ee;}
 .completeBtn{background:#a0d87e;border:none;padding:6px 12px;border-radius:14px;cursor:pointer;font-size:12px;}
 .viewBtn{background:#4a90e2;color:white;border:none;padding:6px 12px;border-radius:14px;cursor:pointer;font-size:12px;}
-
-/* Delivery Charges */
 .deliveryBox{margin-top:50px;background:white;padding:25px;border-radius:25px;box-shadow:0 15px 35px rgba(0,0,0,.08);}
 .deliveryBox h3{margin-bottom:20px;}
 .deliveryBox .province{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .deliveryBox input{width:120px;padding:6px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins';}
-.saveDelivery{margin-top:12px;background:#d8a7a0;border:none;padding:10px 20px;border-radius:22px;cursor:pointer;font-size:14px;}
-
-/* EasyPaisa */
+.saveDelivery{margin-top:12px;background:#d8a7a0;border:none;padding:10px 20px;border-radius:22px;cursor:pointer;font-size:14px; transition: 0.2s;}
+.saveDelivery:active{transform: scale(0.95);}
 .easypaisaBox{margin-top:50px;background:white;padding:25px;border-radius:25px;box-shadow:0 15px 35px rgba(0,0,0,.08);}
 .easypaisaBox h3{margin-bottom:10px;}
-.easypaisaBox small{color:#b96a6a;display:block;margin-bottom:10px;}
+.easypaisaBox small{color:#b96a6a;display:block;margin-bottom:10px; line-height:1.5;}
 .easypaisaBox input{width:100%;padding:8px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins';}
-.saveEasypaisa{background:#d8a7a0;border:none;padding:10px 20px;border-radius:22px;cursor:pointer;font-size:14px;}
+.saveEasypaisa{background:#d8a7a0;border:none;padding:10px 20px;border-radius:22px;cursor:pointer;font-size:14px; transition: 0.2s;}
+.saveEasypaisa:active{transform: scale(0.95);}
 
-/* Modals */
 .modal{position:fixed;inset:0;background:#00000066;display:none;align-items:center;justify-content:center;}
 .modalContent{background:white;padding:30px;border-radius:26px;width:420px;position:relative;animation:fadeIn .3s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
 .modalContent input,.modalContent textarea,.modalContent select{width:100%;margin-bottom:12px;padding:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins';box-sizing:border-box;}
-.modalContent button{background:#d8a7a0;border:none;padding:10px;border-radius:18px;width:100%;cursor:pointer;}
-.closeBtn{position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;color:#b96a6a;}
 
-/* Price input */
+.modalContent button{
+  background:#d8a7a0;
+  border:none;
+  padding:12px;
+  border-radius:18px;
+  width:100%;
+  cursor:pointer;
+  font-weight: 500;
+  color: #4a3b47;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+.modalContent button:hover {
+  background: #c8928a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+.modalContent button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}
+
+.closeBtn{position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;color:#b96a6a;}
 .priceWrapper{position:relative;margin-bottom:12px;}
 .priceWrapper span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#555;font-weight:500;}
 #prodPrice{padding-left:45px;}
-
-/* Image preview */
 .previewImg{width:80px;height:80px;object-fit:cover;border-radius:12px;margin:5px;border:2px solid #d8a7a0;}
 .previewContainer{display:flex;flex-wrap:wrap;margin-bottom:10px;}
 .loading{text-align:center;margin-top:20px;font-size:14px;opacity:.7;}
 .successMsg{margin-top:10px;font-size:14px;color:green;display:none;text-align:center;}
+
+/* MASCOT STYLES */
+.mascot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 180px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.mascot-bubble {
+  background: white;
+  padding: 15px;
+  border-radius: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  margin-bottom: 10px;
+  position: relative;
+  text-align: center;
+  color: #4a3b47;
+  border: 1px solid #f0e6e3;
+  display: none; /* Hidden by default until we show it */
+}
+.mascot-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+.mascot-img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.15));
+  transition: transform 0.3s;
+}
+.mascot-container:hover .mascot-img {
+  transform: scale(1.05);
+}
+/* To prevent overlap with delivery box on small screens */
+@media (max-width: 600px) {
+  .mascot-container { display: none; }
+}
 </style>
 </head>
 <body>
 
 <div class="bubble-bg">
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  <div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
 </div>
 
 <header>
-<img src="logo.png" alt="AaMilNa Logo">
-<button onclick="logout()">Logout</button>
+  <img src="logo.png" alt="AaMilNa Logo" onclick="location.href='index.html'" style="cursor:pointer;">
+  <div class="header-btns">
+    <button onclick="location.href='index.html'">Home</button>
+    <button id="logoutBtn">Logout</button>
+  </div>
 </header>
+
+<!-- MASCOT ELEMENT -->
+<div class="mascot-container" id="mascotContainer">
+  <div class="mascot-bubble" id="mascotBubble">Hello!</div>
+  <img src="mascot.png" id="mascotImg" class="mascot-img" alt="AaMilNa Mascot">
+</div>
 
 <section class="dashboard">
 <h1>Artisan Dashboard</h1>
 
-<!-- Profile -->
-<div class="profileBox">
+<div class="profileBox" id="sectionProfile">
 <img id="avatar" class="avatar" alt="Profile Avatar">
 <div>
 <strong id="pName"></strong><br>
@@ -122,10 +186,9 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 </div>
 </div>
 
-<!-- EasyPaisa -->
-<div class="easypaisaBox">
+<div class="easypaisaBox" id="sectionEasyPaisa">
 <h3>EasyPaisa Account Details</h3>
-<small>Policy: Customer must pay 50% upfront to avoid scams</small>
+<small>Note: Customers are required to pay 50% of the total amount upfront via EasyPaisa. Please wait for the payment confirmation in your account before proceeding with delivery.</small>
 <input type="text" id="epName" placeholder="Account Holder Name">
 <input type="text" id="epNumber" placeholder="Account Number">
 <input type="email" id="epEmail" placeholder="Artisan Gmail (for verification)">
@@ -133,44 +196,31 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 <div id="epMsg" class="successMsg"></div>
 </div>
 
-<!-- Products -->
 <h3 style="margin-top:40px;">Your Products</h3>
-<button class="addBtn" onclick="openProduct()">+ Add Product</button>
+<button class="addBtn" id="addProductBtn" onclick="openProduct()">+ Add Product</button>
 <div class="products" id="productList"></div>
 <div id="productMsg" class="successMsg"></div>
 
-<!-- Orders -->
 <h3 style="margin-top:60px;">Incoming Orders</h3>
-<div class="orders">
+<div class="orders" id="sectionOrders">
 <table id="orderTable">
 <thead>
-<tr>
-<th>Product</th>
-<th>Image</th>
-<th>Customer Name</th>
-<th>Phone</th>
-<th>Email</th>
-<th>Address</th>
-<th>Quantity</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
+<tr><th>Product</th><th>Image</th><th>Customer Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Quantity</th><th>Status</th><th>Action</th></tr>
 </thead>
 <tbody></tbody>
 </table>
 <div id="orderMsg" class="successMsg"></div>
 </div>
 
-<!-- Delivery Charges -->
-<div class="deliveryBox">
+<div class="deliveryBox" id="sectionDelivery">
 <h3>Delivery Charges (PKR)</h3>
-<div class="province">Islamabad <input type="number" id="del-Islamabad" placeholder="0"></div>
-<div class="province">Punjab <input type="number" id="del-Punjab" placeholder="0"></div>
-<div class="province">Sindh <input type="number" id="del-Sindh" placeholder="0"></div>
-<div class="province">Khyber Pakhtunkhwa <input type="number" id="del-KhyberPakhtunkhwa" placeholder="0"></div>
-<div class="province">Balochistan <input type="number" id="del-Balochistan" placeholder="0"></div>
-<div class="province">Gilgit Baltistan <input type="number" id="del-GilgitBaltistan" placeholder="0"></div>
-<div class="province">Azad Jammu and Kashmir <input type="number" id="del-AJK" placeholder="0"></div>
+<div class="province">Islamabad <input type="number" id="del-Islamabad"></div>
+<div class="province">Punjab <input type="number" id="del-Punjab"></div>
+<div class="province">Sindh <input type="number" id="del-Sindh"></div>
+<div class="province">Khyber Pakhtunkhwa <input type="number" id="del-KhyberPakhtunkhwa"></div>
+<div class="province">Balochistan <input type="number" id="del-Balochistan"></div>
+<div class="province">Gilgit Baltistan <input type="number" id="del-GilgitBaltistan"></div>
+<div class="province">Azad Jammu and Kashmir <input type="number" id="del-AJK"></div>
 <button class="saveDelivery" onclick="saveDeliveryCharges()">Save Delivery Charges</button>
 <div id="deliveryMsg" class="successMsg"></div>
 </div>
@@ -191,46 +241,27 @@ h1{font-family:'Playfair Display',serif;font-style:italic;font-size:46px;margin-
 <span class="closeBtn" onclick="productModal.style.display='none'">&times;</span>
 <input id="prodName" placeholder="Product name">
 <textarea id="prodDesc" placeholder="Product description"></textarea>
-<div class="priceWrapper">
-  <span>PKR</span>
-  <input id="prodPrice" type="number" placeholder="Enter price">
-</div>
-<select id="prodCategory">
-<option value="">Select Category</option>
-<option value="crochet">Crochet</option>
-<option value="jewelry">Jewelry</option>
-<option value="stationery">Stationery</option>
-<option value="textile">Textile Arts</option>
-<option value="art">Art & Illustration</option>
-<option value="decor">Home & Decor</option>
-<option value="edible">Edible Art</option>
-<option value="selfcare">Self Care</option>
-<option value="custom">Custom & Personalized</option>
-<option value="tote">Embroidered Tote Bag</option>
-</select>
-<div>
-<label>Upload up to 5 images:</label>
-<input type="file" accept="image/*" multiple onchange="uploadImages(event)">
-<div class="previewContainer" id="previewContainer"></div>
-</div>
-<div style="margin-bottom:12px;">
-<label>Status:</label>
-<select id="prodStatus">
-<option value="open">Open</option>
-<option value="closed">Temporarily Closed</option>
-</select>
-</div>
+<div class="priceWrapper"><span>PKR</span><input id="prodPrice" type="number" placeholder="Enter price"></div>
+<select id="prodCategory"><option value="">Select Category</option>
+<option value="crochet">Crochet</option><option value="jewelry">Jewelry</option>
+<option value="stationery">Stationery</option><option value="textile">Textile Arts</option>
+<option value="art">Art & Illustration</option><option value="decor">Home & Decor</option>
+<option value="edible">Edible Art</option><option value="selfcare">Self Care</option>
+<option value="custom">Custom & Personalized</option><option value="tote">Embroidered Tote Bag</option></select>
+<div><label>Upload up to 5 images:</label><input type="file" accept="image/*" multiple onchange="uploadImages(event)">
+<div class="previewContainer" id="previewContainer"></div></div>
+<div style="margin-bottom:12px;"><label>Status:</label>
+<select id="prodStatus"><option value="open">Open</option><option value="closed">Temporarily Closed</option></select></div>
 <button onclick="saveProduct()">Save Product</button>
 <div id="uploadingMsg" class="loading"></div>
 </div>
 </div>
 
-<!-- Firebase & Cloudinary Scripts -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-// ----------------- Firebase Config -----------------
 const firebaseConfig = {
   apiKey: "AIzaSyCHMIBHlYGqyw4U7ZZplwi4LgQxga99nLM",
   authDomain: "aamilna.firebaseapp.com",
@@ -238,85 +269,214 @@ const firebaseConfig = {
   storageBucket: "aamilna.appspot.com",
   messagingSenderId: "127180284017",
   appId: "1:127180284017:web:b024e50670228b085f7bd0",
-  measurementId: "G-K27L27BHDB"
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-// ----------------- Utilities -----------------
-function showMessage(id,msg){
-  const el=document.getElementById(id);
-  el.textContent=msg; el.style.display='block';
-  setTimeout(()=>{el.style.display='none';},2500);
+function showMessage(id,msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',2500);}
+
+window.logout = async function() {
+  try {
+    await signOut(auth);
+    alert("Logged out successfully!");
+    window.location.href = 'index.html';
+  } catch (error) {
+    console.error("Logout error:", error);
+    alert("Error logging out.");
+  }
 }
-function logout(){alert("Logged out!"); location.reload();}
 
-// ----------------- Profile -----------------
-let currentAvatar="";
-async function loadProfile(){
-  const docRef = doc(db,"artisans","profile");
-  const docSnap = await getDoc(docRef);
-  const profile = docSnap.exists() ? docSnap.data() : {name:"Artisan", bio:"Handmade creator", avatar:"https://via.placeholder.com/150"};
+// --- MASCOT LOGIC ---
+const mascotImg = document.getElementById('mascotImg');
+const mascotBubble = document.getElementById('mascotBubble');
+
+function updateMascot(imgSrc, msg) {
+  mascotImg.src = imgSrc;
+  mascotBubble.textContent = msg;
+  mascotBubble.style.display = 'block';
+}
+
+// Intersection Observer to detect which section is in view
+const sections = document.querySelectorAll('#sectionProfile, #sectionEasyPaisa, #productList, #sectionDelivery');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      if (id === 'sectionProfile') {
+        updateMascot('mascot-waving.png', 'Hi! Start by adding your profile details. You can also upload a nice avatar!');
+      } else if (id === 'sectionEasyPaisa') {
+        updateMascot('mascot-box.png', 'Please add your EasyPaisa details correctly. This is how you get paid!');
+      } else if (id === 'productList') {
+        updateMascot('mascot-painting.png', 'This is your studio! Click "+ Add Product" to start selling. Admin approval is needed.');
+      } else if (id === 'sectionDelivery') {
+        updateMascot('mascot-sitting.png', 'Set delivery charges for different cities here. You can edit them anytime!');
+      }
+    }
+  });
+}, { threshold: 0.5 }); // Trigger when 50% visible
+
+sections.forEach(section => observer.observe(section));
+
+// Specific interaction for Add Product Button
+document.getElementById('addProductBtn').addEventListener('click', () => {
+  updateMascot('mascot-bubble.png', 'Fill all details carefully. You can upload up to 5 images. Set status to Open or Closed!');
+});
+
+// Mascot interaction when modal opens (slight delay to ensure modal is visible)
+const productModalObserver = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.type === "attributes" && mutation.target.id === "productModal") {
+       if(mutation.target.style.display === 'flex') {
+          updateMascot('mascot-bubble.png', 'Fill all details carefully. Upload up to 5 images. Your product will be sent for approval!');
+       } else {
+          // Reset to product list message when modal closes
+          updateMascot('mascot-painting.png', 'This is your studio! Click "+ Add Product" to start selling.');
+       }
+    }
+  });
+});
+productModalObserver.observe(document.getElementById('productModal'), { attributes: true });
+
+// ---------------------
+
+let artisanId=null;
+onAuthStateChanged(auth, async(user)=>{
+  if(user){ 
+    artisanId=user.uid; 
+    
+    // 1. Fetch User Data ONCE
+    const userDocRef = doc(db,"users",artisanId);
+    const docSnap = await getDoc(userDocRef);
+    const userData = docSnap.exists() ? docSnap.data() : {};
+    
+    // 2. Pass data to loaders
+    loadProfile(userData); 
+    loadEasyPaisa(userData); 
+    loadDeliveryCharges(userData); 
+    
+    // 3. Load Products (separate collection)
+    await loadProducts(); 
+  }
+  else{ 
+    window.location.href = 'index.html'; 
+  }
+});
+
+let currentAvatar="", editIndex=null, currentImages=[];
+
+function loadProfile(data){
+  const profile = data || {name:"Artisan",bio:"Handmade creator",avatar:"https://via.placeholder.com/150"};
   document.getElementById('avatar').src=profile.avatar;
   document.getElementById('pName').textContent=profile.name;
   document.getElementById('pBio').textContent=profile.bio;
   document.getElementById('nameInput').value=profile.name;
   document.getElementById('bioInput').value=profile.bio;
 }
-function loadAvatar(e){
+
+window.loadAvatar = function(e){
   const reader=new FileReader();
-  reader.onload=()=>{currentAvatar=reader.result; document.getElementById('avatar').src=currentAvatar;}
+  reader.onload=()=>{currentAvatar=reader.result; document.getElementById('avatar').src=currentAvatar;};
   reader.readAsDataURL(e.target.files[0]);
 }
-async function saveProfile(){
-  const profile={name:document.getElementById('nameInput').value.trim()||"Artisan", bio:document.getElementById('bioInput').value.trim()||"Handmade creator", avatar:currentAvatar||document.getElementById('avatar').src};
-  await setDoc(doc(db,"artisans","profile"),profile);
-  loadProfile(); showMessage('profileMsg','Profile updated!');
-  profileModal.style.display='none';
+
+window.saveProfile = async function(){
+  if(!artisanId) return;
+  const profile={
+    name:document.getElementById('nameInput').value.trim()||"Artisan",
+    bio:document.getElementById('bioInput').value.trim()||"Handmade creator",
+    avatar:currentAvatar||document.getElementById('avatar').src
+  };
+  await setDoc(doc(db,"users",artisanId),profile,{merge:true});
+  document.getElementById('pName').textContent=profile.name;
+  document.getElementById('pBio').textContent=profile.bio;
+  showMessage('profileMsg','Profile updated!'); 
+  document.getElementById('profileModal').style.display='none';
 }
 
-// ----------------- EasyPaisa -----------------
-async function loadEasyPaisa(){
-  const docRef=doc(db,"artisans","easyPaisa");
-  const docSnap=await getDoc(docRef);
-  const ep=docSnap.exists()?docSnap.data():{name:'',number:'',email:''};
-  document.getElementById('epName').value=ep.name;
-  document.getElementById('epNumber').value=ep.number;
-  document.getElementById('epEmail').value=ep.email;
-}
-async function saveEasyPaisa(){
-  const ep={name:document.getElementById('epName').value.trim(), number:document.getElementById('epNumber').value.trim(), email:document.getElementById('epEmail').value.trim()};
-  if(!ep.name||!ep.number||!ep.email){alert("All EasyPaisa fields required!"); return;}
-  await setDoc(doc(db,"artisans","easyPaisa"),ep);
-  showMessage('epMsg','EasyPaisa saved!');
+function loadEasyPaisa(data){
+  document.getElementById('epName').value=data.epName || '';
+  document.getElementById('epNumber').value=data.epNumber || '';
+  document.getElementById('epEmail').value=data.epEmail || '';
 }
 
-// ----------------- Products -----------------
-let editIndex=null, currentImages=[];
+window.saveEasyPaisa = async function(){
+  if(!artisanId) return;
+  const epName=document.getElementById('epName').value.trim(); 
+  const epNumber=document.getElementById('epNumber').value.trim(); 
+  const epEmail=document.getElementById('epEmail').value.trim();
+
+  if(!epName||!epNumber||!epEmail){alert("All EasyPaisa fields required!"); return;}
+  
+  try {
+    await setDoc(doc(db,"users",artisanId), { 
+      epName: epName, 
+      epNumber: epNumber, 
+      epEmail: epEmail 
+    }, { merge: true });
+    showMessage('epMsg','EasyPaisa saved!');
+  } catch (error) {
+    console.error("Error saving EasyPaisa: ", error);
+    alert("Failed to save details. Check console for errors.");
+  }
+}
+
+function loadDeliveryCharges(data){
+  const provinces = ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"];
+  provinces.forEach(p => {
+    const inputField = document.getElementById(`del-${p}`);
+    if(inputField) {
+       const dbKey = `del_${p}`; 
+       const val = data[dbKey];
+       inputField.value = val !== undefined ? val : 0;
+    }
+  });
+}
+
+window.saveDeliveryCharges = async function(){
+  if(!artisanId) return;
+  
+  const updates = {}; 
+  const provinces = ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"];
+  
+  provinces.forEach(p => {
+    const inputField = document.getElementById(`del-${p}`);
+    const val = inputField ? parseInt(inputField.value) : 0;
+    updates[`del_${p}`] = isNaN(val) ? 0 : val; 
+  });
+  
+  try {
+    await setDoc(doc(db,"users",artisanId), updates, { merge: true });
+    showMessage('deliveryMsg','Delivery charges saved!');
+  } catch (error) {
+    console.error("Error saving delivery charges: ", error);
+    alert("Failed to save charges. Check console for errors.");
+  }
+}
+
 async function loadProducts(){
-  const container=document.getElementById('productList');
-  container.innerHTML="";
-  const querySnapshot = await getDocs(collection(db,"products"));
+  if(!artisanId) return;
+  const container=document.getElementById('productList'); container.innerHTML="";
+  const q=query(collection(db,"products"),where("artisanId","==",artisanId),where("deleted","==",false));
+  const querySnapshot = await getDocs(q);
   if(querySnapshot.empty){container.innerHTML="<div class='loading'>No products yet.</div>"; return;}
-  querySnapshot.forEach((docSnap)=>{
-    const p=docSnap.data(); const i=docSnap.id;
+  querySnapshot.forEach(docSnap=>{
+    const p=docSnap.data(); const id=docSnap.id;
     const div=document.createElement('div'); div.className='product';
-    div.innerHTML=`<img src="${p.images[0]||'https://via.placeholder.com/300'}">
-    <h4>${p.name}</h4>
+    div.innerHTML=`<img src="${p.images[0]||'https://via.placeholder.com/300'}"><h4>${p.name}</h4>
     <div class="product-price"><span>PKR</span>${p.price}</div>
     <div class="product-status">Status: ${p.status}</div>
     <div class="product-likes">Likes: ${p.likes||0}</div>
     <div class="controls">
-      <button class="edit" onclick="openProduct('${i}')">Edit</button>
-      <button class="delete" onclick="deleteProduct('${i}')">Delete</button>
+      <button class="edit" onclick="openProduct('${id}')">Edit</button>
+      <button class="delete" onclick="deleteProduct('${id}')">Delete</button>
     </div>`;
     container.appendChild(div);
   });
 }
-function openProduct(id=null){
-  editIndex=id;
-  document.getElementById('previewContainer').innerHTML="";
-  currentImages=[];
+
+window.openProduct = function(id=null){
+  editIndex=id; currentImages=[]; document.getElementById('previewContainer').innerHTML='';
   if(id){
     getDoc(doc(db,"products",id)).then(docSnap=>{
       if(docSnap.exists()){
@@ -330,65 +490,62 @@ function openProduct(id=null){
         document.getElementById('previewContainer').innerHTML=currentImages.map(img=>`<img src="${img}" class="previewImg">`).join('');
       }
     });
-  } else {document.getElementById('prodName').value=''; document.getElementById('prodDesc').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodCategory').value=''; document.getElementById('prodStatus').value='open';}
-  productModal.style.display='flex';
-}
-async function saveProduct(){
-  const name=document.getElementById('prodName').value.trim();
-  if(!name){alert("Product name required!"); return;}
-  const p={name, description:document.getElementById('prodDesc').value.trim(), price:parseInt(document.getElementById('prodPrice').value)||0, category:document.getElementById('prodCategory').value, status:document.getElementById('prodStatus').value, images:currentImages, likes:0};
-  if(editIndex){await setDoc(doc(db,"products",editIndex),p);} 
-  else{await setDoc(doc(db,"products",Date.now().toString()),p);}
-  loadProducts(); showMessage('productMsg','Product saved!'); productModal.style.display='none';
-}
-async function deleteProduct(id){
-  if(!confirm("Delete this product?")) return;
-  await updateDoc(doc(db,"products",id),{deleted:true});
-  loadProducts();
+  } else {
+    document.getElementById('prodName').value=''; document.getElementById('prodDesc').value=''; document.getElementById('prodPrice').value='';
+    document.getElementById('prodCategory').value=''; document.getElementById('prodStatus').value='open';
+  }
+  document.getElementById('productModal').style.display='flex';
 }
 
-// ----------------- Cloudinary Upload -----------------
-async function uploadImages(e){
-  const files=Array.from(e.target.files).slice(0,5);
-  const container=document.getElementById('previewContainer'); container.innerHTML=''; currentImages=[];
+window.saveProduct = async function(){
+  if(!artisanId) return;
+  const name=document.getElementById('prodName').value.trim();
+  if(!name){alert("Product name required!"); return;}
+  let likes=0;
+  if(editIndex){
+    const docSnap=await getDoc(doc(db,"products",editIndex));
+    likes=docSnap.exists()?docSnap.data().likes||0:0;
+  }
+  const p={
+    name, 
+    description:document.getElementById('prodDesc').value.trim(), 
+    price:parseInt(document.getElementById('prodPrice').value)||0, 
+    category:document.getElementById('prodCategory').value, 
+    status:document.getElementById('prodStatus').value, 
+    images:currentImages, 
+    likes, 
+    artisanId, 
+    deleted:false
+  };
+  
+  const docId = editIndex || Date.now().toString();
+  await setDoc(doc(db,"products",docId),p);
+  
+  editIndex=null; currentImages=[]; document.getElementById('previewContainer').innerHTML='';
+  await loadProducts(); showMessage('productMsg','Product saved!'); document.getElementById('productModal').style.display='none';
+}
+
+window.deleteProduct = async function(id){
+  if(!confirm("Delete this product?")) return;
+  await updateDoc(doc(db,"products",id),{deleted:true});
+  await loadProducts();
+}
+
+window.uploadImages = async function(e){
+  const files=Array.from(e.target.files).slice(0,5); currentImages=[]; document.getElementById('previewContainer').innerHTML='';
   for(const file of files){
-    const formData=new FormData();
-    formData.append("file",file);
-    formData.append("upload_preset","aamilna_unsigned");
+    const formData=new FormData(); formData.append("file",file); formData.append("upload_preset","aamilna_unsigned");
     const res=await fetch("https://api.cloudinary.com/v1_1/dfmpbdhrv/image/upload",{method:"POST",body:formData});
-    const data=await res.json();
-    currentImages.push(data.secure_url);
-    const img=document.createElement('img'); img.src=data.secure_url; img.className='previewImg'; container.appendChild(img);
+    const data=await res.json(); currentImages.push(data.secure_url);
+    const img=document.createElement('img'); img.src=data.secure_url; img.className='previewImg'; document.getElementById('previewContainer').appendChild(img);
   }
 }
 
-// ----------------- Delivery Charges -----------------
-async function loadDeliveryCharges(){
-  const docRef=doc(db,"artisans","deliveryCharges");
-  const docSnap=await getDoc(docRef);
-  const charges=docSnap.exists()?docSnap.data():{};
-  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{document.getElementById(`del-${p}`).value=charges[p]||0;});
-}
-async function saveDeliveryCharges(){
-  const charges={};
-  ["Islamabad","Punjab","Sindh","KhyberPakhtunkhwa","Balochistan","GilgitBaltistan","AJK"].forEach(p=>{charges[p]=parseInt(document.getElementById(`del-${p}`).value)||0;});
-  await setDoc(doc(db,"artisans","deliveryCharges"),charges);
-  showMessage('deliveryMsg','Delivery charges saved!');
-}
+document.getElementById('logoutBtn').addEventListener('click', window.logout);
 
-// ----------------- Initial Load -----------------
-loadProfile();
-loadEasyPaisa();
-loadProducts();
-loadDeliveryCharges();
 </script>
 </body>
 </html>
-
-
-
-
-
 
 
 

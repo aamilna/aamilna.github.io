@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AaMilNa • Arcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;user-select:none;}
+  body{font-family:'Poppins',sans-serif;background:#fff7f0;color:#4a3b47;overflow:hidden;}
+  
+  /* --- SCREEN SYSTEM --- */
+  .screen {
+    position: fixed; inset: 0;
+    display: none; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1;
+  }
+  .screen.active { display: flex; opacity: 1; z-index: 10; }
+
+  /* --- HUB SCREEN --- */
+  #hubScreen { background: linear-gradient(135deg, #fff7f0 0%, #ffeadd 100%); }
+  .hub-container { text-align: center; max-width: 600px; padding: 20px; animation: fadeUp 1s ease; }
+  .hub-title { font-family: 'Playfair Display'; font-size: 42px; color: #c8928a; margin-bottom: 10px; }
+  .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-top: 40px; }
+  
+  .hub-card {
+    background: white; padding: 30px 20px; border-radius: 24px; 
+    box-shadow: 0 15px 30px rgba(0,0,0,0.08); cursor: pointer; transition: 0.3s;
+    border: 2px solid transparent;
+  }
+  .hub-card:hover { transform: translateY(-8px); border-color: #d8a7a0; }
+  .hub-icon { font-size: 50px; margin-bottom: 15px; display: block; }
+  .hub-name { font-family: 'Playfair Display'; font-size: 22px; color: #4a3b47; margin-bottom: 5px; }
+  .hub-desc { font-size: 13px; color: #888; }
+
+  /* --- INTRO SCREEN --- */
+  #introScreen { background: linear-gradient(135deg, #fff7f0 0%, #ffeadd 100%); text-align: center; padding: 20px; }
+  .intro-content { max-width: 400px; animation: fadeUp 1s ease; }
+  @keyframes fadeUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  
+  .intro-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #d8a7a0; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(216,167,160,0.2); }
+  .intro-title { font-family: 'Playfair Display'; font-size: 36px; color: #c8928a; margin-bottom: 10px; line-height: 1.2; }
+  .intro-desc { font-size: 15px; color: #888; margin-bottom: 30px; line-height: 1.6; }
+  
+  /* --- LEVEL SELECT SCREEN --- */
+  .level-select-screen { background: #fff7f0; padding: 20px; height: 100vh; overflow-y: auto; justify-content: flex-start; padding-top: 80px; }
+  
+  .level-header { text-align: center; margin-bottom: 20px; }
+  .level-header h2 { font-family: 'Playfair Display'; color: #4a3b47; }
+  .level-header p { font-size: 13px; color: #888; }
+
+  .levels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; max-width: 600px; }
+  
+  .level-card {
+    background: white; border-radius: 20px; padding: 15px; text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
+    border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .level-card:hover { transform: translateY(-5px); border-color: #d8a7a0; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+  .level-card.locked { opacity: 0.6; filter: grayscale(1); pointer-events: none; }
+  
+  .level-icon { font-size: 32px; margin-bottom: 8px; }
+  .level-name { font-weight: 600; font-size: 14px; color: #4a3b47; }
+  .level-diff { font-size: 10px; color: #aaa; margin-top: 4px; background: #f5f5f5; padding: 2px 8px; border-radius: 10px; }
+
+  /* --- GAME SCREEN --- */
+  .game-screen { background: #eadfd4; }
+  header{width:100%;padding:15px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.05);display:flex;justify-content:center;align-items:center;gap:15px;z-index:10;}
+  header img{height:50px;cursor:pointer;}
+  header h2{font-family:'Playfair Display';font-size:20px;color:#d8a7a0;}
+
+  .game-wrapper{width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px; overflow-y: auto;}
+  
+  /* EMBROIDERY SPECIFIC */
+  .hoop-container {
+    position: relative; width: 320px; height: 320px; border-radius: 50%;
+    background: linear-gradient(135deg, #a87e5b, #7d5a3c);
+    padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 2px 5px rgba(255,255,255,0.2);
+    animation: hoopDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    flex-shrink: 0;
+  }
+  @keyframes hoopDrop { 0% { transform: scale(0.5) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+
+  .fabric-inner {
+    position: relative; width: 100%; height: 100%; border-radius: 50%; background: #fefefe; overflow: hidden;
+    background-image: radial-gradient(#ddd 1px, transparent 1px), radial-gradient(#ddd 1px, transparent 1px);
+    background-size: 4px 4px; background-position: 0 0, 2px 2px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+  }
+  
+  /* CROCHET SPECIFIC */
+  .crochet-grid-container {
+    display: grid; gap: 2px; background: #fff; padding: 10px; border-radius: 20px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid #e6d5c3;
+  }
+  .crochet-cell {
+    width: 40px; height: 40px; background: #f9f9f9; border-radius: 50%; 
+    cursor: pointer; transition: 0.2s; border: 1px solid #eee;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .crochet-cell.active { background: #d8a7a0; border-color: #c8928a; transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  
+  .pattern-preview {
+    display: grid; gap: 1px; background: #fff; padding: 5px; border-radius: 8px; border: 1px solid #ddd;
+    margin-bottom: 15px;
+  }
+  .preview-cell { width: 15px; height: 15px; border-radius: 50%; background: #f0f0f0; }
+  .preview-cell.active { background: #d8a7a0; }
+
+  #rewardEmoji {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0; opacity: 0; z-index: 1;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(255, 255, 255, 0.9); border-radius: 50%;
+  }
+  #rewardEmoji.show {
+    font-size: 150px; opacity: 1; z-index: 3;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+
+  .info-panel { margin-top: 25px; text-align: center; background: rgba(255,255,255,0.9); padding: 15px 30px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); min-width: 300px; }
+  .progress-bar-bg { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
+  .progress-bar-fill { width: 0%; height: 100%; background: #d8a7a0; transition: width 0.2s; }
+
+  h3{font-size:18px;color:#4a3b47;margin-bottom:5px;}
+  p{font-size:13px;color:#888;}
+
+  /* Buttons */
+  .btn{background:#d8a7a0;color:white;border:none;padding:12px 30px;border-radius:25px;font-weight:600;cursor:pointer;margin-top:15px;transition:0.2s;box-shadow:0 4px 10px rgba(216,167,160,0.3);}
+  .btn:hover{background:#c8928a;transform:translateY(-2px);}
+  .btn-secondary{background:white;color:#4a3b47;box-shadow:none;margin-top:5px;}
+  .btn-back{position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.8);color:#4a3b47;padding:8px 15px;font-size:12px;z-index:20;}
+
+  /* --- MODALS --- */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .modal-content{
+    background:white;padding:30px;border-radius:24px;text-align:center;max-width:320px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.2);animation:popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position:relative; 
+  }
+  @keyframes popIn{0%{transform:scale(0.8);opacity:0;}100%{transform:scale(1);opacity:1;}}
+  
+  .modal h2{font-family:'Playfair Display';color:#d8a7a0;font-size:28px;margin-bottom:10px;}
+  .modal p{font-size:14px;color:#666;margin-bottom:20px;line-height:1.6;}
+  .fact-box{background:#fff7f0;padding:10px;border-radius:10px;font-size:12px;color:#b89a94;margin-top:10px;}
+
+  .modal-close {
+    position: absolute; top: 10px; right: 15px; font-size: 20px; color: #ccc;
+    cursor: pointer; transition: 0.2s; font-family: sans-serif;
+  }
+  .modal-close:hover { color: #d8a7a0; }
+
+</style>
+</head>
+<body>
+
+<!-- 0. HUB SCREEN -->
+<div id="hubScreen" class="screen active">
+  <div class="hub-container">
+    <img src="logo.png" class="intro-logo" alt="AaMilNa" style="margin:0 auto 20px;">
+    <h1 class="hub-title">Artisan Arcade</h1>
+    <p style="color:#888; margin-bottom:10px;">Learn the basics of handmade crafts through play.</p>
+    
+    <div class="hub-grid">
+      <!-- Stitch Studio Card -->
+      <div class="hub-card" onclick="showScreen('introScreen')">
+        <span class="hub-icon">🧵</span>
+        <h3 class="hub-name">Stitch Studio</h3>
+        <p class="hub-desc">Learn embroidery patterns & patience.</p>
+      </div>
+      
+      <!-- Crochet Corner Card -->
+      <div class="hub-card" onclick="showScreen('crochetIntroScreen')">
+        <span class="hub-icon">🧶</span>
+        <h3 class="hub-name">Crochet Corner</h3>
+        <p class="hub-desc">Practice grid patterns & counting.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 1. STITCH INTRO SCREEN -->
+<div id="introScreen" class="screen">
+  <button class="btn btn-back" onclick="showScreen('hubScreen')">← Back</button>
+  <div class="intro-content">
+    <h1 class="intro-title">Stitch Studio</h1>
+    <p class="intro-desc">Unwind with the art of embroidery. Learn to stitch beautiful patterns with just a tap, and discover the patience of an artisan.</p>
+    <button class="btn" onclick="showScreen('stitchLevelSelect')">Enter Studio</button>
+  </div>
+</div>
+
+<!-- 2. CROCHET INTRO SCREEN -->
+<div id="crochetIntroScreen" class="screen">
+  <button class="btn btn-back" onclick="showScreen('hubScreen')">← Back</button>
+  <div class="intro-content">
+    <h1 class="intro-title">Crochet Corner</h1>
+    <p class="intro-desc">Master the art of the Granny Square. Match the pattern by tapping the grid to "yarn over" and create beautiful designs.</p>
+    <button class="btn" onclick="showScreen('crochetLevelSelect')">Start Hooking</button>
+  </div>
+</div>
+
+<!-- 3. STITCH LEVEL SELECT -->
+<div id="stitchLevelSelect" class="screen level-select-screen">
+  <button class="btn btn-back" onclick="showScreen('introScreen')">← Back</button>
+  <div class="level-header">
+    <h2>Embroidery Patterns</h2>
+    <p>20 Levels of Stitching</p>
+  </div>
+  <div class="levels-grid" id="stitchLevelGrid"></div>
+</div>
+
+<!-- 4. CROCHET LEVEL SELECT -->
+<div id="crochetLevelSelect" class="screen level-select-screen">
+  <button class="btn btn-back" onclick="showScreen('crochetIntroScreen')">← Back</button>
+  <div class="level-header">
+    <h2>Granny Squares</h2>
+    <p>20 Levels to Master</p>
+  </div>
+  <div class="levels-grid" id="crochetLevelGrid"></div>
+</div>
+
+<!-- 5. STITCH GAME SCREEN -->
+<div id="stitchGameScreen" class="screen game-screen">
+  <header>
+    <img src="logo.png" alt="AaMilNa" onclick="location.href='index.html'">
+    <h2 id="stitchGameTitle">Stitch Studio</h2>
+  </header>
+  <div class="game-wrapper">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="stitchProgressBar"></div></div>
+    <div class="hoop-container">
+      <div class="fabric-inner">
+        <canvas id="stitchCanvas"></canvas>
+        <div id="rewardEmoji"></div>
+      </div>
+    </div>
+    <div class="info-panel">
+      <h3 id="stitchLevelTitle">Level Name</h3>
+      <p id="stitchLevelDesc">Description</p>
+    </div>
+  </div>
+</div>
+
+<!-- 6. CROCHET GAME SCREEN -->
+<div id="crochetGameScreen" class="screen game-screen">
+  <header>
+    <img src="logo.png" alt="AaMilNa" onclick="location.href='index.html'">
+    <h2 id="croquetGameTitle">Crochet Corner</h2>
+  </header>
+  <div class="game-wrapper">
+    <div class="info-panel" style="margin-top:0; margin-bottom:20px; display:flex; gap:20px; align-items:center; justify-content:center;">
+        <div>
+            <p style="margin-bottom:5px; font-weight:600;">Target</p>
+            <div id="crochetTargetPreview" class="pattern-preview"></div>
+        </div>
+    </div>
+    
+    <div class="progress-bar-bg" style="width:250px;"><div class="progress-bar-fill" id="crochetProgressBar"></div></div>
+    
+    <div id="crochetGridContainer" class="crochet-grid-container" style="margin-top:20px;">
+        <!-- Grid generated by JS -->
+    </div>
+
+    <div class="info-panel">
+      <h3 id="crochetLevelTitle">Level Name</h3>
+      <p id="crochetLevelDesc">Description</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODALS -->
+<div class="modal" id="stitchModal">
+  <div class="modal-content">
+    <div class="modal-close" onclick="closeModal('stitchModal')">✕</div>
+    <h2>Beautiful! 🌸</h2>
+    <p>You completed the pattern!</p>
+    <div class="fact-box" id="stitchFactBox">Fun fact about embroidery!</div>
+    <button class="btn" onclick="nextStitchLevel()">Next Pattern →</button>
+    <button class="btn btn-secondary" onclick="showScreen('stitchLevelSelect')">Back to Patterns</button>
+  </div>
+</div>
+
+<div class="modal" id="crochetModal">
+  <div class="modal-content">
+    <div class="modal-close" onclick="closeModal('crochetModal')">✕</div>
+    <h2>Perfect Stitch! 🧶</h2>
+    <p>You made a granny square!</p>
+    <div class="fact-box" id="crochetFactBox">Fun fact about crochet!</div>
+    <button class="btn" onclick="nextCrochetLevel()">Next Square →</button>
+    <button class="btn btn-secondary" onclick="showScreen('crochetLevelSelect')">Back to Squares</button>
+  </div>
+</div>
+
+<div class="modal" id="gameOverModal">
+  <div class="modal-content">
+    <div class="modal-close" onclick="closeModal('gameOverModal')">✕</div>
+    <h2>Master Artisan! 🏆</h2>
+    <p>You have completed all challenges!</p>
+    <button class="btn" onclick="location.href='shop.html'">Shop Real Crafts</button>
+    <button class="btn btn-secondary" onclick="showScreen('hubScreen')">Back to Hub</button>
+  </div>
+</div>
+
+<script>
+// ==========================================
+//          STITCH GAME DATA & LOGIC
+// ==========================================
+const stitchLevels = [
+  // Set 1: Basics
+  { name: "The Heart", icon: "💜", diff: "Beginner", desc: "A symbol of love.", points: [{x:0.5,y:0.3},{x:0.75,y:0.2},{x:0.8,y:0.45},{x:0.65,y:0.75},{x:0.5,y:0.85},{x:0.35,y:0.75},{x:0.2,y:0.45},{x:0.25,y:0.2},{x:0.5,y:0.3}], fact: "Hearts represent love in textile art." },
+  { name: "The Star", icon: "⭐", diff: "Easy", desc: "Reach for the skies.", points: [{x:0.5,y:0.15},{x:0.35,y:0.85},{x:0.85,y:0.35},{x:0.15,y:0.35},{x:0.65,y:0.85},{x:0.5,y:0.15}], fact: "Stars are common in Sashiko." },
+  { name: "The Flower", icon: "🌸", diff: "Easy", desc: "Nature's masterpiece.", points: [{x:0.5,y:0.5},{x:0.5,y:0.2},{x:0.5,y:0.5},{x:0.8,y:0.5},{x:0.5,y:0.5},{x:0.5,y:0.8},{x:0.5,y:0.5},{x:0.2,y:0.5}], fact: "Florals are the most popular motif." },
+  { name: "The Leaf", icon: "🍃", diff: "Intermediate", desc: "Growth and nature.", points: [{x:0.5,y:0.85},{x:0.3,y:0.5},{x:0.5,y:0.15},{x:0.7,y:0.5},{x:0.5,y:0.85}], fact: "Leaves symbolize growth." },
+  { name: "Diamond", icon: "💎", diff: "Intermediate", desc: "Precise geometry.", points: [{x:0.5,y:0.15},{x:0.85,y:0.5},{x:0.5,y:0.85},{x:0.15,y:0.5},{x:0.5,y:0.15}], fact: "Diamonds create optical illusions in quilts." },
+  { name: "The Moon", icon: "🌙", diff: "Advanced", desc: "Celestial dreams.", points: [{x:0.7,y:0.2},{x:0.7,y:0.8},{x:0.4,y:0.6},{x:0.4,y:0.4},{x:0.7,y:0.2}], fact: "Moons were used to ward off bad dreams." },
+  { name: "Sailboat", icon: "⛵", diff: "Advanced", desc: "Adventure awaits.", points: [{x:0.5,y:0.2},{x:0.8,y:0.6},{x:0.8,y:0.75},{x:0.2,y:0.75},{x:0.5,y:0.6},{x:0.5,y:0.2}], fact: "Nautical themes were common on uniforms." },
+  { name: "The Fish", icon: "🐟", diff: "Expert", desc: "A classic motif.", points: [{x:0.8,y:0.5},{x:0.6,y:0.3},{x:0.2,y:0.2},{x:0.2,y:0.8},{x:0.6,y:0.7},{x:0.8,y:0.5}], fact: "Fish symbolize abundance in Chinese art." },
+  // Set 2: Shapes
+  { name: "Triangle", icon: "🔺", diff: "Beginner", desc: "Three points.", points: [{x:0.5,y:0.2},{x:0.8,y:0.8},{x:0.2,y:0.8},{x:0.5,y:0.2}], fact: "Triangles are often used in quilting." },
+  { name: "Square", icon: "🟧", diff: "Easy", desc: "Perfect balance.", points: [{x:0.3,y:0.3},{x:0.7,y:0.3},{x:0.7,y:0.7},{x:0.3,y:0.7},{x:0.3,y:0.3}], fact: "Square dance quilts are a classic American art." },
+  { name: "Pentagon", icon: "⬠", diff: "Intermediate", desc: "Five sides.", points: [{x:0.5,y:0.15},{x:0.85,y:0.45},{x:0.7,y:0.85},{x:0.3,y:0.85},{x:0.15,y:0.45},{x:0.5,y:0.15}], fact: "Five-sided shapes are rare in nature but common in design." },
+  { name: "Hexagon", icon: "⬡", diff: "Intermediate", desc: "The honeycomb.", points: [{x:0.5,y:0.15},{x:0.85,y:0.35},{x:0.85,y:0.65},{x:0.5,y:0.85},{x:0.15,y:0.65},{x:0.15,y:0.35},{x:0.5,y:0.15}], fact: "Hexagons are used in 'Grandmother's Flower Garden' quilts." },
+  { name: "Arrow", icon: "➡️", diff: "Easy", desc: "Moving forward.", points: [{x:0.2,y:0.5},{x:0.5,y:0.2},{x:0.8,y:0.5},{x:0.5,y:0.5},{x:0.5,y:0.8},{x:0.4,y:0.8},{x:0.4,y:0.5},{x:0.2,y:0.5}], fact: "Arrows indicate direction in pattern guides." },
+  { name: "Lightning", icon: "⚡", diff: "Intermediate", desc: "A sudden spark.", points: [{x:0.6,y:0.15},{x:0.4,y:0.45},{x:0.6,y:0.45},{x:0.4,y:0.85}], fact: "Zigzag stitches are used for stretchy fabrics." },
+  { name: "Spiral", icon: "🌀", diff: "Advanced", desc: "Inward journey.", points: [{x:0.5,y:0.5},{x:0.6,y:0.4},{x:0.6,y:0.6},{x:0.4,y:0.6},{x:0.4,y:0.4},{x:0.7,y:0.4},{x:0.7,y:0.7},{x:0.3,y:0.7},{x:0.3,y:0.3}], fact: "Spirals represent evolution and growth." },
+  { name: "Cross", icon: "✝️", diff: "Easy", desc: "Faith and geometry.", points: [{x:0.4,y:0.2},{x:0.6,y:0.2},{x:0.6,y:0.4},{x:0.8,y:0.4},{x:0.8,y:0.6},{x:0.6,y:0.6},{x:0.6,y:0.8},{x:0.4,y:0.8},{x:0.4,y:0.6},{x:0.2,y:0.6},{x:0.2,y:0.4},{x:0.4,y:0.4},{x:0.4,y:0.2}], fact: "Cross stitch is one of the oldest forms of embroidery." },
+  // Set 3: Objects & Nature
+  { name: "Tree", icon: "🌲", diff: "Intermediate", desc: "Life and roots.", points: [{x:0.5,y:0.2},{x:0.7,y:0.4},{x:0.6,y:0.4},{x:0.8,y:0.6},{x:0.55,y:0.6},{x:0.55,y:0.8},{x:0.45,y:0.8},{x:0.45,y:0.6},{x:0.2,y:0.6},{x:0.4,y:0.4},{x:0.3,y:0.4},{x:0.5,y:0.2}], fact: "Tree of life motifs appear in cultures worldwide." },
+  { name: "House", icon: "🏠", diff: "Easy", desc: "Home sweet home.", points: [{x:0.5,y:0.2},{x:0.8,y:0.5},{x:0.8,y:0.8},{x:0.2,y:0.8},{x:0.2,y:0.5},{x:0.5,y:0.2}], fact: "House quilts are popular for storytelling." },
+  { name: "Butterfly", icon: "🦋", diff: "Advanced", desc: "Metamorphosis.", points: [{x:0.5,y:0.5},{x:0.2,y:0.2},{x:0.1,y:0.5},{x:0.2,y:0.8},{x:0.5,y:0.5},{x:0.8,y:0.2},{x:0.9,y:0.5},{x:0.8,y:0.8},{x:0.5,y:0.5}], fact: "Butterflies symbolize transformation." },
+  { name: "Umbrella", icon: "☂️", diff: "Intermediate", desc: "Weather the storm.", points: [{x:0.2,y:0.5},{x:0.3,y:0.3},{x:0.5,y:0.2},{x:0.7,y:0.3},{x:0.8,y:0.5},{x:0.5,y:0.5},{x:0.5,y:0.8},{x:0.4,y:0.85}], fact: "Umbrella blocks are common in rainy-day quilts." },
+  { name: "Crown", icon: "👑", diff: "Intermediate", desc: "Royalty.", points: [{x:0.2,y:0.7},{x:0.2,y:0.4},{x:0.35,y:0.6},{x:0.5,y:0.3},{x:0.65,y:0.6},{x:0.8,y:0.4},{x:0.8,y:0.7},{x:0.2,y:0.7}], fact: "Queens and kings were often depicted in tapestries." }
+];
+
+let currentStitchIndex = 0;
+let stitchPoints = [];
+let connectedStitchPoints = [];
+let nextStitchIndex = 0;
+
+const stitchCanvas = document.getElementById('stitchCanvas');
+const stitchCtx = stitchCanvas.getContext('2d');
+const stitchProgressBar = document.getElementById('stitchProgressBar');
+const rewardEmoji = document.getElementById('rewardEmoji');
+
+function initStitchLevelSelect() {
+  const grid = document.getElementById('stitchLevelGrid');
+  grid.innerHTML = '';
+  stitchLevels.forEach((l, i) => {
+    const card = document.createElement('div');
+    card.className = 'level-card';
+    card.onclick = () => startStitchLevel(i);
+    card.innerHTML = `<div class="level-icon">${l.icon}</div><div class="level-name">${l.name}</div><div class="level-diff">${l.diff}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function startStitchLevel(index) {
+  currentStitchIndex = index;
+  const level = stitchLevels[index];
+  
+  stitchPoints = level.points.map((p, i) => ({...p, id: i+1}));
+  connectedStitchPoints = [];
+  nextStitchIndex = 0;
+  stitchProgressBar.style.width = '0%';
+  
+  rewardEmoji.className = '';
+  rewardEmoji.innerHTML = '';
+  
+  document.getElementById('stitchGameTitle').innerText = level.name;
+  document.getElementById('stitchLevelTitle').innerText = level.name;
+  document.getElementById('stitchLevelDesc').innerText = level.desc;
+  
+  showScreen('stitchGameScreen');
+  setTimeout(() => {
+    resizeStitchCanvas();
+    drawStitchCanvas();
+  }, 100);
+}
+
+function resizeStitchCanvas() {
+  const rect = stitchCanvas.parentElement.getBoundingClientRect();
+  stitchCanvas.width = rect.width * 2;
+  stitchCanvas.height = rect.height * 2;
+  stitchCtx.scale(2, 2);
+}
+
+function drawStitchCanvas() {
+  const w = stitchCanvas.width / 2;
+  const h = stitchCanvas.height / 2;
+  stitchCtx.clearRect(0, 0, w, h);
+
+  // Draw Thread
+  if(connectedStitchPoints.length > 1) {
+    stitchCtx.beginPath();
+    stitchCtx.moveTo(connectedStitchPoints[0].x * w, connectedStitchPoints[0].y * h);
+    for(let i = 1; i < connectedStitchPoints.length; i++) {
+      stitchCtx.lineTo(connectedStitchPoints[i].x * w, connectedStitchPoints[i].y * h);
+    }
+    stitchCtx.strokeStyle = '#c8928a';
+    stitchCtx.lineWidth = 3;
+    stitchCtx.lineCap = 'round';
+    stitchCtx.stroke();
+  }
+
+  // Draw Points
+  stitchPoints.forEach((p, index) => {
+    const x = p.x * w;
+    const y = p.y * h;
+    const isActive = (index === nextStitchIndex);
+    const isDone = index < nextStitchIndex;
+
+    if(!isDone) {
+      stitchCtx.fillStyle = isActive ? '#d8a7a0' : '#aaa';
+      stitchCtx.font = "bold 11px Poppins";
+      stitchCtx.textAlign = "center";
+      stitchCtx.fillText(p.id, x, y - 20);
+    }
+
+    stitchCtx.beginPath();
+    stitchCtx.arc(x, y, isActive ? 10 : 7, 0, Math.PI * 2);
+    if(isDone) {
+      stitchCtx.fillStyle = '#eee';
+    } else {
+      stitchCtx.fillStyle = isActive ? '#fff' : '#f9f9f9';
+      stitchCtx.strokeStyle = isActive ? '#d8a7a0' : '#ddd';
+      stitchCtx.lineWidth = isActive ? 3 : 1;
+      stitchCtx.fill();
+      stitchCtx.stroke();
+    }
+  });
+}
+
+function handleStitchInteraction(e) {
+  e.preventDefault();
+  if(nextStitchIndex >= stitchPoints.length) return;
+
+  const rect = stitchCanvas.getBoundingClientRect();
+  let clientX = (e.touches) ? e.touches[0].clientX : e.clientX;
+  let clientY = (e.touches) ? e.touches[0].clientY : e.clientY;
+  const pos = { x: clientX - rect.left, y: clientY - rect.top };
+
+  const target = stitchPoints[nextStitchIndex];
+  const tx = target.x * (stitchCanvas.width/2);
+  const ty = target.y * (stitchCanvas.height/2);
+  const dist = Math.sqrt((pos.x - tx)**2 + (pos.y - ty)**2);
+
+  if (dist < 40) {
+    connectedStitchPoints.push(target);
+    stitchProgressBar.style.width = ((connectedStitchPoints.length / stitchPoints.length) * 100) + '%';
+
+    if (nextStitchIndex < stitchPoints.length - 1) {
+      nextStitchIndex++;
+      drawStitchCanvas();
+    } else {
+      completeStitchLevel();
+    }
+  }
+}
+
+function completeStitchLevel() {
+  const levelData = stitchLevels[currentStitchIndex];
+  stitchCtx.clearRect(0, 0, stitchCanvas.width/2, stitchCanvas.height/2);
+  rewardEmoji.innerHTML = levelData.icon;
+  rewardEmoji.classList.add('show');
+  document.getElementById('stitchFactBox').innerText = levelData.fact;
+  setTimeout(() => { document.getElementById('stitchModal').style.display = 'flex'; }, 600);
+}
+
+function nextStitchLevel() {
+  closeModal('stitchModal');
+  currentStitchIndex++;
+  if (currentStitchIndex >= stitchLevels.length) {
+    document.getElementById('gameOverModal').style.display = 'flex';
+  } else {
+    startStitchLevel(currentStitchIndex);
+  }
+}
+
+stitchCanvas.addEventListener('mousedown', handleStitchInteraction);
+stitchCanvas.addEventListener('touchstart', handleStitchInteraction);
+
+
+// ==========================================
+//          CROCHET GAME DATA & LOGIC
+// ==========================================
+const crochetLevels = [
+  // Set 1
+  { name: "Single Knot", icon: "🔘", diff: "Tutorial", size: 3, desc: "Just one stitch.", pattern: [[0,0,0],[0,1,0],[0,0,0]], fact: "Crochet uses a hook to loop yarn." },
+  { name: "The Line", icon: "➖", diff: "Easy", size: 3, desc: "A simple row.", pattern: [[0,0,0],[1,1,1],[0,0,0]], fact: "Tension is key in crochet." },
+  { name: "Cross Stitch", icon: "✖️", diff: "Easy", size: 3, desc: "Diagonal lines.", pattern: [[1,0,0],[0,1,0],[0,0,1]], fact: "Cross stitch is an embroidery style." },
+  { name: "The Border", icon: "⏹️", diff: "Intermediate", size: 4, desc: "Edge the square.", pattern: [[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,1,1,1]], fact: "Borders strengthen fabric edges." },
+  { name: "Checkers", icon: "🔲", diff: "Intermediate", size: 4, desc: "Classic pattern.", pattern: [[1,0,1,0],[0,1,0,1],[1,0,1,0],[0,1,0,1]], fact: "Alternating colors creates checkers." },
+  { name: "Center Heart", icon: "💗", diff: "Advanced", size: 5, desc: "Love in the middle.", pattern: [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0],[0,0,0,0,0]], fact: "Hearts are timeless motifs." },
+  { name: "X Mark", icon: "❎", diff: "Advanced", size: 5, desc: "Thick cross.", pattern: [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1]], fact: "Symmetry is pleasing to the eye." },
+  { name: "Granny Classic", icon: "🧶", diff: "Expert", size: 6, desc: "The real deal.", pattern: [[1,1,1,1,1,1],[1,0,0,0,0,1],[1,0,1,1,0,1],[1,0,1,1,0,1],[1,0,0,0,0,1],[1,1,1,1,1,1]], fact: "Granny squares are often joined to make blankets." },
+  // Set 2: Shapes
+  { name: "Diamond", icon: "💎", diff: "Easy", size: 5, desc: "A gem shape.", pattern: [[0,0,0,1,0],[0,0,1,1,0],[0,1,1,0,0],[0,0,1,1,0],[0,0,0,1,0]], fact: "Diamond shapes are trendy in modern crochet." },
+  { name: "Triangle", icon: "🔺", diff: "Easy", size: 4, desc: "Pointing up.", pattern: [[0,0,1,0],[0,1,1,0],[1,1,1,1],[0,0,0,0]], fact: "Triangle shawls are popular accessories." },
+  { name: "Circle", icon: "⚫", diff: "Intermediate", size: 5, desc: "Round shape approx.", pattern: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]], fact: "Crochet in the round creates circles." },
+  { name: "Plus Sign", icon: "➕", diff: "Easy", size: 5, desc: "Add it up.", pattern: [[0,0,1,0,0],[0,0,1,0,0],[1,1,1,1,1],[0,0,1,0,0],[0,0,1,0,0]], fact: "Plus signs look great in filet crochet." },
+  { name: "T-Shape", icon: "👕", diff: "Intermediate", size: 4, desc: "T for Textile.", pattern: [[1,1,1,1],[0,0,1,0],[0,0,1,0],[0,0,1,0]], fact: "T-shirt yarn is used for chunky crochet." },
+  { name: "Arrow", icon: "⬆️", diff: "Advanced", size: 5, desc: "Directional.", pattern: [[0,0,1,0,0],[0,1,1,1,0],[1,0,1,0,1],[0,0,1,0,0],[0,0,1,0,0]], fact: "Chevron patterns are essentially arrows repeated." },
+  { name: "Spiral", icon: "🌀", diff: "Advanced", size: 5, desc: "Spinning.", pattern: [[0,0,0,0,1],[1,1,1,0,1],[1,0,1,0,1],[1,0,0,0,1],[1,1,1,1,1]], fact: "Surface crochet can create spiral lines." },
+  { name: "Star Shape", icon: "⭐", diff: "Expert", size: 5, desc: "Twinkling.", pattern: [[1,0,1,0,1],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,0,1,0,1]], fact: "Star stitches create a thick, warm fabric." },
+  // Set 3: Symbols & Advanced
+  { name: "Letter A", icon: "🅰️", diff: "Intermediate", size: 4, desc: "A for Art.", pattern: [[0,1,1,0],[1,0,0,1],[1,1,1,1],[1,0,0,1],[1,0,0,1]], fact: "Monogramming is a classic personalized gift." },
+  { name: "Letter B", icon: "🅱️", diff: "Intermediate", size: 4, desc: "B for Button.", pattern: [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,0,1],[1,1,1,0]], fact: "Filet crochet is often used for letters." },
+  { name: "Smiley", icon: "😊", diff: "Advanced", size: 5, desc: "Happy vibes.", pattern: [[0,1,1,1,0],[1,0,0,0,1],[1,0,1,0,1],[1,0,0,0,1],[0,1,1,1,0]], fact: "Amigurumi is the art of crocheting stuffed toys." },
+  { name: "Ghost", icon: "👻", diff: "Expert", size: 5, desc: "Spooky cute.", pattern: [[0,1,1,1,0],[1,0,0,0,1],[1,0,1,0,1],[1,0,0,0,1],[1,1,1,1,1]], fact: "Holiday-themed crochet is very popular." }
+];
+
+let currentCrochetIndex = 0;
+let crochetGrid = []; // 0 = empty, 1 = filled
+
+function initCrochetLevelSelect() {
+  const grid = document.getElementById('crochetLevelGrid');
+  grid.innerHTML = '';
+  crochetLevels.forEach((l, i) => {
+    const card = document.createElement('div');
+    card.className = 'level-card';
+    card.onclick = () => startCrochetLevel(i);
+    card.innerHTML = `<div class="level-icon">${l.icon}</div><div class="level-name">${l.name}</div><div class="level-diff">${l.diff}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function startCrochetLevel(index) {
+  currentCrochetIndex = index;
+  const level = crochetLevels[index];
+  
+  // Reset Grid
+  crochetGrid = Array(level.size).fill().map(() => Array(level.size).fill(0));
+  
+  // Update UI
+  document.getElementById('croquetGameTitle').innerText = level.name;
+  document.getElementById('crochetLevelTitle').innerText = level.name;
+  document.getElementById('crochetLevelDesc').innerText = level.desc;
+  document.getElementById('crochetProgressBar').style.width = '0%';
+  
+  renderCrochetTarget(level);
+  renderCrochetGrid(level);
+  
+  showScreen('crochetGameScreen');
+}
+
+function renderCrochetTarget(level) {
+    const preview = document.getElementById('crochetTargetPreview');
+    preview.style.gridTemplateColumns = `repeat(${level.size}, 1fr)`;
+    preview.innerHTML = '';
+    level.pattern.forEach((row, r) => {
+        row.forEach(cell => {
+            const div = document.createElement('div');
+            div.className = 'preview-cell' + (cell === 1 ? ' active' : '');
+            preview.appendChild(div);
+        });
+    });
+}
+
+function renderCrochetGrid(level) {
+    const container = document.getElementById('crochetGridContainer');
+    container.style.gridTemplateColumns = `repeat(${level.size}, 1fr)`;
+    container.innerHTML = '';
+    
+    level.pattern.forEach((row, r) => {
+        row.forEach((cell, c) => {
+            const div = document.createElement('div');
+            div.className = 'crochet-cell';
+            div.dataset.row = r;
+            div.dataset.col = c;
+            div.onclick = (e) => toggleCrochetCell(r, c, level);
+            container.appendChild(div);
+        });
+    });
+}
+
+function toggleCrochetCell(r, c, level) {
+    // Toggle logic: 0 <-> 1
+    crochetGrid[r][c] = crochetGrid[r][c] === 1 ? 0 : 1;
+    
+    // Visual update
+    const cells = document.querySelectorAll('.crochet-cell');
+    const index = r * level.size + c;
+    if(crochetGrid[r][c] === 1) {
+        cells[index].classList.add('active');
+        cells[index].innerText = "•"; // Simple visual
+    } else {
+        cells[index].classList.remove('active');
+        cells[index].innerText = "";
+    }
+    
+    checkCrochetProgress(level);
+}
+
+function checkCrochetProgress(level) {
+    let correct = 0;
+    let total = level.size * level.size;
+    let currentFilled = 0;
+    let targetFilled = 0;
+    
+    for(let r=0; r<level.size; r++) {
+        for(let c=0; c<level.size; c++) {
+            if(level.pattern[r][c] === 1) targetFilled++;
+            if(crochetGrid[r][c] === 1) currentFilled++;
+            
+            if(crochetGrid[r][c] === level.pattern[r][c]) correct++;
+        }
+    }
+    
+    // Progress bar based on correctness
+    document.getElementById('crochetProgressBar').style.width = ((correct/total)*100) + '%';
+    
+    if(correct === total) {
+        completeCrochetLevel();
+    }
+}
+
+function completeCrochetLevel() {
+    const level = crochetLevels[currentCrochetIndex];
+    document.getElementById('crochetFactBox').innerText = level.fact;
+    setTimeout(() => { document.getElementById('crochetModal').style.display = 'flex'; }, 300);
+}
+
+function nextCrochetLevel() {
+    closeModal('crochetModal');
+    currentCrochetIndex++;
+    if (currentCrochetIndex >= crochetLevels.length) {
+        document.getElementById('gameOverModal').style.display = 'flex';
+    } else {
+        startCrochetLevel(currentCrochetIndex);
+    }
+}
+
+
+// ==========================================
+//          GLOBAL FUNCTIONS
+// ==========================================
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  
+  if(id === 'stitchLevelSelect') initStitchLevelSelect();
+  if(id === 'crochetLevelSelect') initCrochetLevelSelect();
+  if(id === 'stitchGameScreen') setTimeout(() => { resizeStitchCanvas(); drawStitchCanvas(); }, 50);
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+// Resize Listener
+window.addEventListener('resize', () => {
+    if(document.getElementById('stitchGameScreen').classList.contains('active')) {
+        resizeStitchCanvas();
+        drawStitchCanvas();
+    }
+});
+
+// Initial Load
+showScreen('hubScreen');
+
+</script>
+</body>
+</html>
