@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Artisan Dashboard — AaMilNa</title>
+<title>My Dashboard — AaMilNa</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -176,18 +176,23 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
 .status-ship{background:#d1ecf1;color:#0c5460;}
 .status-delivered{background:#d4edda;color:#155724;}
 
-/* Products Grid (Mockup) */
-.products-grid{
+/* Wishlist Grid */
+.wishlist-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;
 }
-.product-item{
+.wish-item{
   background:white;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-soft);
   border:1px solid rgba(246,215,215,0.3);text-align:center;
 }
-.prod-img{height:120px;background:rgba(246,215,215,0.2);display:flex;align-items:center;justify-content:center;font-size:40px;}
-.prod-info{padding:15px;}
-.prod-info h4{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:5px;}
-.prod-price{color:var(--rose-gold);font-weight:600;margin-bottom:10px;}
+.wish-img{height:120px;background:rgba(246,215,215,0.2);display:flex;align-items:center;justify-content:center;font-size:40px;}
+.wish-info{padding:15px;}
+.wish-info h4{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:5px;}
+.wish-price{color:var(--rose-gold);font-weight:600;margin-bottom:10px;}
+.wish-btn{
+  width:100%;background:linear-gradient(135deg,var(--rose-gold),var(--blush-deep));
+  color:white;border:none;padding:8px;border-radius:10px;cursor:pointer;
+  font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;
+}
 
 /* Profile View */
 .profile-view-card{
@@ -227,16 +232,16 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
 </div>
 
 <header>
-  <!-- FIX: Updated to Home%20Page.html -->
+  <!-- FIX: Linked to Home Page.html using %20 for the space -->
   <img src="logo.png.jpeg" alt="AaMilNa Logo" class="logo" onclick="window.location.href='Home%20Page.html'">
   <div class="header-nav">
     <a href="Home%20Page.html" class="header-btn">🏠 <span>Home</span></a>
-    <a href="shop.html" class="header-btn primary">🛍️ <span>View Shop</span></a>
+    <a href="shop.html" class="header-btn primary">🛍️ <span>Continue Shopping</span></a>
     <div class="profile-container">
       <div class="profile-avatar" id="avatar">U</div>
       <div class="profile-dropdown" id="dropdown">
-        <h4 id="dpName">Artisan Name</h4>
-        <p id="dpEmail">artisan@email.com</p>
+        <h4 id="dpName">Customer Name</h4>
+        <p id="dpEmail">customer@email.com</p>
         <button onclick="logout()">Logout</button>
       </div>
     </div>
@@ -246,13 +251,13 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
 <div class="dashboard-container">
   <aside class="sidebar">
     <div class="sidebar-profile">
-      <div class="sidebar-avatar" id="sideAvatar">🎨</div>
-      <h3 id="sideName">Artisan</h3>
-      <span>Verified Seller</span>
+      <div class="sidebar-avatar" id="sideAvatar">👤</div>
+      <h3 id="sideName">Customer</h3>
+      <span>Verified Buyer</span>
     </div>
     <nav class="sidebar-nav">
-      <button class="nav-item active" onclick="switchView('orders', event)"><span class="icon">📦</span> Orders</button>
-      <button class="nav-item" onclick="switchView('products', event)"><span class="icon">🛍️</span> My Products</button>
+      <button class="nav-item active" onclick="switchView('orders', event)"><span class="icon">📦</span> My Orders</button>
+      <button class="nav-item" onclick="switchView('wishlist', event)"><span class="icon">💖</span> Wishlist</button>
       <button class="nav-item" onclick="switchView('profile', event)"><span class="icon">⚙️</span> Profile</button>
       <a href="Home%20Page.html" class="nav-item"><span class="icon">🏠</span> Back to Home</a>
       <button class="nav-item logout" onclick="logout()"><span class="icon">🚪</span> Logout</button>
@@ -264,24 +269,24 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
     <!-- ORDERS VIEW -->
     <section id="orders" class="view-section active">
       <div class="section-header">
-        <h2>Recent Orders</h2>
+        <h2>My Orders</h2>
       </div>
       
       <div class="stats-grid">
         <div class="stat-card">
-          <h4>Total Revenue</h4>
-          <div class="val">Rs. 12,500</div>
-          <div class="sub">Lifetime earnings</div>
+          <h4>Total Orders</h4>
+          <div class="val">3</div>
+          <div class="sub">Lifetime purchases</div>
         </div>
         <div class="stat-card">
-          <h4>Pending</h4>
+          <h4>In Transit</h4>
+          <div class="val">1</div>
+          <div class="sub">On the way to you</div>
+        </div>
+        <div class="stat-card">
+          <h4>Delivered</h4>
           <div class="val">2</div>
-          <div class="sub">Awaiting fulfillment</div>
-        </div>
-        <div class="stat-card">
-          <h4>Completed</h4>
-          <div class="val">15</div>
-          <div class="sub">Successfully delivered</div>
+          <div class="sub">Successfully received</div>
         </div>
       </div>
 
@@ -289,8 +294,9 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
         <thead>
           <tr>
             <th>Order ID</th>
-            <th>Customer</th>
+            <th>Date</th>
             <th>Item</th>
+            <th>Artisan</th>
             <th>Total (PKR)</th>
             <th>Status</th>
           </tr>
@@ -298,22 +304,25 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
         <tbody id="ordersBody">
           <tr>
             <td><strong>#AAM108</strong></td>
-            <td>Priya K.</td>
+            <td>12 Aug 2026</td>
             <td>Custom Crochet Bag</td>
+            <td>Maya Crafts</td>
             <td>4,500</td>
             <td><span class="status-badge status-pending">Pending</span></td>
           </tr>
           <tr>
             <td><strong>#AAM105</strong></td>
-            <td>Daniel R.</td>
+            <td>05 Aug 2026</td>
             <td>Wool Beanie</td>
+            <td>Thread & Co.</td>
             <td>1,800</td>
             <td><span class="status-badge status-ship">Shipped</span></td>
           </tr>
           <tr>
             <td><strong>#AAM099</strong></td>
-            <td>Aisha M.</td>
+            <td>28 July 2026</td>
             <td>Ceramic Vase</td>
+            <td>Clay & Soul</td>
             <td>6,200</td>
             <td><span class="status-badge status-delivered">Delivered</span></td>
           </tr>
@@ -321,33 +330,35 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
       </table>
     </section>
 
-    <!-- PRODUCTS VIEW -->
-    <section id="products" class="view-section">
+    <!-- WISHLIST VIEW -->
+    <section id="wishlist" class="view-section">
       <div class="section-header">
-        <h2>My Products</h2>
-        <button class="header-btn primary" onclick="showToast('➕ Add Product feature coming soon!')">➕ Add New</button>
+        <h2>My Wishlist</h2>
       </div>
       
-      <div class="products-grid">
-        <div class="product-item">
-          <div class="prod-img">🧶</div>
-          <div class="prod-info">
+      <div class="wishlist-grid">
+        <div class="wish-item">
+          <div class="wish-img">🧶</div>
+          <div class="wish-info">
             <h4>Crochet Scarf</h4>
-            <div class="prod-price">Rs. 2,500</div>
+            <div class="wish-price">Rs. 2,500</div>
+            <button class="wish-btn">Add to Cart</button>
           </div>
         </div>
-        <div class="product-item">
-          <div class="prod-img">🧶</div>
-          <div class="prod-info">
-            <h4>Crochet Beanie</h4>
-            <div class="prod-price">Rs. 1,200</div>
+        <div class="wish-item">
+          <div class="wish-img">💍</div>
+          <div class="wish-info">
+            <h4>Wire Ring</h4>
+            <div class="wish-price">Rs. 1,200</div>
+            <button class="wish-btn">Add to Cart</button>
           </div>
         </div>
-        <div class="product-item">
-          <div class="prod-img">🧶</div>
-          <div class="prod-info">
-            <h4>Tote Bag</h4>
-            <div class="prod-price">Rs. 3,500</div>
+        <div class="wish-item">
+          <div class="wish-img">🕯️</div>
+          <div class="wish-info">
+            <h4>Soy Candle</h4>
+            <div class="wish-price">Rs. 1,500</div>
+            <button class="wish-btn">Add to Cart</button>
           </div>
         </div>
       </div>
@@ -356,19 +367,19 @@ header img.logo{height:50px;width:auto;cursor:pointer;transition:0.3s;}
     <!-- PROFILE VIEW -->
     <section id="profile" class="view-section">
       <div class="section-header">
-        <h2>Artisan Profile</h2>
+        <h2>Profile Settings</h2>
       </div>
       
       <div class="profile-view-card">
         <div class="profile-cover"></div>
-        <div class="profile-pic" id="profPic">🎨</div>
-        <h2 id="profName">Artisan Name</h2>
-        <div class="role">Verified Seller</div>
+        <div class="profile-pic" id="profPic">👤</div>
+        <h2 id="profName">Customer Name</h2>
+        <div class="role">Verified Buyer</div>
         
         <div class="profile-details">
-          <p><strong>📧 Email:</strong> <span id="profEmail">artisan@email.com</span></p>
+          <p><strong>📧 Email:</strong> <span id="profEmail">customer@email.com</span></p>
           <p><strong>📱 Phone:</strong> <span id="profPhone">+92 300 1234567</span></p>
-          <p><strong>🧵 Primary Craft:</strong> <span id="profCraft">Crochet</span></p>
+          <p><strong>📍 Shipping Address:</strong> <span id="profAddress">House #123, Block A, Karachi, Pakistan</span></p>
           <p><strong>📅 Member Since:</strong> <span>August 2026</span></p>
         </div>
       </div>
@@ -397,8 +408,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // --- STATE (Safe JSON parsing) ---
-let artisan = null;
-try { artisan = JSON.parse(localStorage.getItem("artisanProfile")); } catch(e) { localStorage.removeItem("artisanProfile"); }
+let customer = null;
+try { customer = JSON.parse(localStorage.getItem("customer")); } catch(e) { localStorage.removeItem("customer"); }
 
 // --- TOAST ---
 const toast = document.getElementById('toast');
@@ -412,28 +423,28 @@ window.showToast = showToast;
 // --- AUTH GUARD & PROFILE SETUP (Error-proof) ---
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    // If not logged in, send them to the artisan login page
-    window.location.href = 'artisan-signup.html';
+    // If not logged in, send them to the login page
+    window.location.href = 'customer-login.html';
   } else {
     try {
       // If we don't have local data or the UID doesn't match, fetch from Firestore
-      if (!artisan || artisan.id !== user.uid) {
+      if (!customer || customer.id !== user.uid) {
         const docSnap = await getDoc(doc(db, "users", user.uid));
         if (docSnap.exists()) {
           const data = docSnap.data();
-          // Role check: If a customer ends up here, redirect them safely
-          if (data.role !== 'artisan') {
-            window.location.href = 'customer-dashboard.html';
+          // Role check: If an artisan ends up here, redirect them safely
+          if (data.role === 'artisan') {
+            window.location.href = 'artisan-dashboard.html';
             return;
           }
-          artisan = { id: user.uid, ...data };
-          localStorage.setItem('artisanProfile', JSON.stringify(artisan));
+          customer = { id: user.uid, ...data };
+          localStorage.setItem('customer', JSON.stringify(customer));
           setupProfile();
         } else {
           // If user exists in Auth but not DB, force logout to prevent ghost sessions
           await signOut(auth);
-          localStorage.removeItem('artisanProfile');
-          window.location.href = 'artisan-signup.html';
+          localStorage.removeItem('customer');
+          window.location.href = 'customer-login.html';
         }
       } else {
         setupProfile();
@@ -441,29 +452,28 @@ onAuthStateChanged(auth, async (user) => {
     } catch (error) {
       console.error("Dashboard Auth Error:", error);
       // Fallback: If Firestore fails but we have local storage, use it
-      if (artisan) setupProfile();
+      if (customer) setupProfile();
     }
   }
 });
 
 function setupProfile() {
-  if(!artisan) return;
-  const initial = artisan.name ? artisan.name.charAt(0).toUpperCase() : 'U';
+  if(!customer) return;
+  const initial = customer.name ? customer.name.charAt(0).toUpperCase() : 'U';
   document.getElementById('avatar').textContent = initial;
-  document.getElementById('dpName').textContent = artisan.name || 'Artisan';
-  document.getElementById('dpEmail').textContent = artisan.email;
-  document.getElementById('sideName').textContent = artisan.name;
+  document.getElementById('dpName').textContent = customer.name || 'Customer';
+  document.getElementById('dpEmail').textContent = customer.email;
+  document.getElementById('sideName').textContent = customer.name;
   
   // Profile View
-  document.getElementById('profName').textContent = artisan.name;
-  document.getElementById('profEmail').textContent = artisan.email;
-  document.getElementById('profPhone').textContent = artisan.phone || 'Not provided';
-  document.getElementById('profCraft').textContent = artisan.craft || 'Not specified';
+  document.getElementById('profName').textContent = customer.name;
+  document.getElementById('profEmail').textContent = customer.email;
+  document.getElementById('profPhone').textContent = customer.phone || 'Not provided';
 }
 
 window.logout = async function() {
   await signOut(auth);
-  localStorage.removeItem('artisanProfile');
+  localStorage.removeItem('customer');
   // Send them back to the home page after logout
   window.location.href = 'Home%20Page.html';
 }
@@ -489,6 +499,13 @@ window.addEventListener('click', (e) => {
   if(!e.target.closest('.profile-container')) {
     document.getElementById('dropdown').classList.remove('show');
   }
+});
+
+// --- WISHLIST BUTTONS ---
+document.querySelectorAll('.wish-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    showToast('🛒 Added to cart!');
+  });
 });
 </script>
 </body>
